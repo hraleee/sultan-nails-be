@@ -1,7 +1,7 @@
 import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
-import { pool } from '../db/connection';
+import { supabase } from '../db/connection';
 
 const router = express.Router();
 
@@ -12,18 +12,16 @@ router.use(requireAdmin);
 // Funzione helper per aggiornare automaticamente le prenotazioni scadute
 const updateExpiredBookings = async () => {
   try {
-    const now = new Date();
-    const result = await pool.query(
-      `UPDATE bookings 
-       SET status = 'completed', updated_at = CURRENT_TIMESTAMP
-       WHERE booking_date < $1 
-       AND status IN ('pending', 'confirmed')
-       RETURNING id`,
-      [now]
-    );
-    
-    if (result.rows.length > 0) {
-      console.log(`✅ Auto-completate ${result.rows.length} prenotazioni scadute`);
+    const now = new Date().toISOString();
+    const { data } = await supabase
+      .from('bookings')
+      .update({ status: 'completed', updated_at: now })
+      .lt('booking_date', now)
+      .in('status', ['pending', 'confirmed'])
+      .select('id');
+
+    if (data && data.length > 0) {
+      console.log(`✅ Auto-completate ${data.length} prenotazioni scadute`);
     }
   } catch (error) {
     console.error('Error updating expired bookings:', error);
@@ -38,42 +36,51 @@ router.get('/bookings', async (req: AuthRequest, res: Response) => {
 
     const { status, from, to } = req.query;
 
-    let query = `
-      SELECT 
-        b.id, b.service_id, b.service_name, b.service_price, b.booking_date, 
-        b.duration_minutes, b.status, b.notes, b.created_at,
-        u.id as user_id, u.email, u.first_name, u.last_name, u.phone
-      FROM bookings b
-      JOIN users u ON b.user_id = u.id
-      WHERE 1=1
-    `;
-
-    const params: any[] = [];
-    let paramCount = 1;
+    let query = supabase
+      .from('bookings')
+      .select(`
+        id, service_id, service_name, service_price, booking_date, 
+        duration_minutes, status, notes, created_at,
+        users (
+          id, email, first_name, last_name, phone
+        )
+      `)
+      .order('booking_date', { ascending: false });
 
     if (status) {
-      query += ` AND b.status = $${paramCount}`;
-      params.push(status);
-      paramCount++;
+      query = query.eq('status', status);
     }
 
     if (from) {
-      query += ` AND b.booking_date >= $${paramCount}`;
-      params.push(from);
-      paramCount++;
+      query = query.gte('booking_date', from);
     }
 
     if (to) {
-      query += ` AND b.booking_date <= $${paramCount}`;
-      params.push(to);
-      paramCount++;
+      query = query.lte('booking_date', to);
     }
 
-    query += ' ORDER BY b.booking_date DESC';
+    const { data, error } = await query;
+    if (error) throw error;
 
-    const result = await pool.query(query, params);
+    // Flatten logic to match previous SQL response structure
+    const bookings = data.map((b: any) => ({
+      id: b.id,
+      service_id: b.service_id,
+      service_name: b.service_name,
+      service_price: b.service_price,
+      booking_date: b.booking_date,
+      duration_minutes: b.duration_minutes,
+      status: b.status,
+      notes: b.notes,
+      created_at: b.created_at,
+      user_id: b.users?.id,
+      email: b.users?.email,
+      first_name: b.users?.first_name,
+      last_name: b.users?.last_name,
+      phone: b.users?.phone,
+    }));
 
-    res.json({ bookings: result.rows });
+    res.json({ bookings });
   } catch (error) {
     console.error('Get all bookings error:', error);
     res.status(500).json({ error: 'Errore nel recupero delle prenotazioni' });
@@ -106,49 +113,50 @@ router.post(
       }
 
       // Check for overlapping bookings
-      const existingBookings = await pool.query(
-        `SELECT id FROM bookings 
-         WHERE booking_date = $1 
-         AND status IN ('pending', 'confirmed')
-         LIMIT 1`,
-        [bookingDate]
-      );
+      const { data: existingBookings } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('booking_date', bookingDate)
+        .in('status', ['pending', 'confirmed'])
+        .limit(1);
 
-      if (existingBookings.rows.length > 0) {
+      if (existingBookings && existingBookings.length > 0) {
         return res.status(400).json({ error: 'Data e ora già prenotate' });
       }
 
       // Try to find service by name to get service_id
       let serviceId = null;
       if (serviceName) {
-        const serviceResult = await pool.query(
-          'SELECT id FROM services WHERE name = $1 LIMIT 1',
-          [serviceName]
-        );
-        if (serviceResult.rows.length > 0) {
-          serviceId = serviceResult.rows[0].id;
+        const { data: service } = await supabase
+          .from('services')
+          .select('id')
+          .eq('name', serviceName)
+          .maybeSingle();
+        if (service) {
+          serviceId = service.id;
         }
       }
 
-      const result = await pool.query(
-        `INSERT INTO bookings 
-         (user_id, service_id, service_name, service_price, booking_date, duration_minutes, notes, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
-         RETURNING id, service_id, service_name, service_price, booking_date, duration_minutes, status, notes, created_at`,
-        [
-          userId,
-          serviceId,
-          serviceName,
-          servicePrice || null,
-          bookingDate,
-          durationMinutes || 60,
-          notes || null,
-        ]
-      );
+      const { data: booking, error } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: userId,
+          service_id: serviceId,
+          service_name: serviceName,
+          service_price: servicePrice || null,
+          booking_date: bookingDate,
+          duration_minutes: durationMinutes || 60,
+          notes: notes || null,
+          status: 'pending'
+        })
+        .select('id, service_id, service_name, service_price, booking_date, duration_minutes, status, notes, created_at')
+        .single();
+
+      if (error) throw error;
 
       res.status(201).json({
         message: 'Prenotazione creata con successo',
-        booking: result.rows[0],
+        booking,
       });
     } catch (error) {
       console.error('Create booking error:', error);
@@ -171,24 +179,26 @@ router.patch(
       const { status } = req.body;
       const { id } = req.params;
 
-      const result = await pool.query(
-        `UPDATE bookings 
-         SET status = $1, updated_at = CURRENT_TIMESTAMP 
-         WHERE id = $2 
-         RETURNING id, status`,
-        [status, id]
-      );
+      const { data: booking, error } = await supabase
+        .from('bookings')
+        .update({ status: status, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select('id, status')
+        .single();
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Prenotazione non trovata' });
-      }
+      if (error) throw error; // Will throw if not found (because single() implies 1 row) ? No, single() throws if 0 rows. Correct.
+      // Wait, supabase update response on empty match is empty array, single() throws 'JSON object requested, multiple (or no) rows returned'.
+      // So we catch that.
 
       res.json({
         message: 'Stato prenotazione aggiornato',
-        booking: result.rows[0],
+        booking,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update booking status error:', error);
+      if (error.code === 'PGRST116') {
+        return res.status(404).json({ error: 'Prenotazione non trovata' });
+      }
       res.status(500).json({ error: 'Errore nell\'aggiornamento della prenotazione' });
     }
   }
@@ -197,14 +207,14 @@ router.patch(
 // Ottieni tutti gli utenti (admin)
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
-    const result = await pool.query(
-      `SELECT 
-        id, email, first_name, last_name, phone, role, created_at
-       FROM users 
-       ORDER BY created_at DESC`
-    );
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, email, first_name, last_name, phone, role, created_at')
+      .order('created_at', { ascending: false });
 
-    res.json({ users: result.rows });
+    if (error) throw error;
+
+    res.json({ users });
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ error: 'Errore nel recupero degli utenti' });
@@ -214,29 +224,35 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
 // Statistiche (admin)
 router.get('/stats', async (req: AuthRequest, res: Response) => {
   try {
-    const [bookingsStats, usersStats, recentBookings] = await Promise.all([
-      pool.query(`
-        SELECT 
-          status, 
-          COUNT(*) as count 
-        FROM bookings 
-        GROUP BY status
-      `),
-      pool.query('SELECT COUNT(*) as total FROM users WHERE role = $1', ['user']),
-      pool.query(`
-        SELECT COUNT(*) as count 
-        FROM bookings 
-        WHERE booking_date >= CURRENT_DATE
-      `),
+    const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+
+    const [bookingsStatusResult, usersCountResult, upcomingBookingsCountResult] = await Promise.all([
+      // 1. Get all bookings statuses to manual aggregate
+      supabase.from('bookings').select('status'),
+      // 2. Count users
+      supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'user'),
+      // 3. Count upcoming bookings
+      supabase.from('bookings').select('*', { count: 'exact', head: true }).gte('booking_date', today)
     ]);
+
+    // Aggregation for bookings by status
+    const statusCounts: Record<string, number> = {};
+    if (bookingsStatusResult.data) {
+      bookingsStatusResult.data.forEach((b: any) => {
+        statusCounts[b.status] = (statusCounts[b.status] || 0) + 1;
+      });
+    }
+
+    // Convert map to array format: [{ status: '...', count: '...' }, ...]
+    const byStatus = Object.entries(statusCounts).map(([status, count]) => ({ status, count: String(count) }));
 
     res.json({
       bookings: {
-        byStatus: bookingsStats.rows,
-        upcoming: parseInt(recentBookings.rows[0].count),
+        byStatus,
+        upcoming: upcomingBookingsCountResult.count || 0,
       },
       users: {
-        total: parseInt(usersStats.rows[0].total),
+        total: usersCountResult.count || 0,
       },
     });
   } catch (error) {
@@ -246,4 +262,5 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
 });
 
 export default router;
+
 

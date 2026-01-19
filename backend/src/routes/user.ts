@@ -2,7 +2,7 @@ import express, { Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
 import { authenticate, AuthRequest } from '../middleware/auth';
-import { pool } from '../db/connection';
+import { supabase } from '../db/connection';
 
 const router = express.Router();
 
@@ -12,19 +12,18 @@ router.use(authenticate);
 // Ottieni profilo utente
 router.get('/profile', async (req: AuthRequest, res: Response) => {
   try {
-    const result = await pool.query(
-      `SELECT 
-        id, email, first_name, last_name, phone, role, created_at
-       FROM users 
-       WHERE id = $1`,
-      [req.user!.id]
-    );
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, email, first_name, last_name, phone, role, created_at')
+      .eq('id', req.user!.id)
+      .maybeSingle();
 
-    if (result.rows.length === 0) {
+    if (error) throw error;
+
+    if (!user) {
       return res.status(404).json({ error: 'Utente non trovato' });
     }
 
-    const user = result.rows[0];
     res.json({
       user: {
         id: user.id,
@@ -63,16 +62,27 @@ router.patch(
       const userId = req.user!.id;
 
       // Recupera utente attuale per controlli password e email
-      const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
-      if (userResult.rows.length === 0) {
+      const { data: currentUser, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+      if (!currentUser) {
         return res.status(404).json({ error: 'Utente non trovato' });
       }
-      const currentUser = userResult.rows[0];
 
       // Se cambia email, controlla unicità
       if (email && email !== currentUser.email) {
-        const emailCheck = await pool.query('SELECT id FROM users WHERE email = $1 AND id != $2', [email, userId]);
-        if (emailCheck.rows.length > 0) {
+        const { data: emailCheck } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', email)
+          .neq('id', userId)
+          .maybeSingle();
+
+        if (emailCheck) {
           return res.status(400).json({ error: 'Email già in uso' });
         }
       }
@@ -83,7 +93,7 @@ router.patch(
         if (!currentPassword) {
           return res.status(400).json({ error: 'Password attuale richiesta per impostare una nuova password' });
         }
-        console.log('Password check debug:', { provided: currentPassword, storedHash: currentUser.password_hash });
+
         const isValid = await bcrypt.compare(currentPassword, currentUser.password_hash);
         if (!isValid) {
           return res.status(400).json({ error: 'Password attuale non corretta' });
@@ -91,32 +101,27 @@ router.patch(
         passwordHash = await bcrypt.hash(newPassword, 10);
       }
 
-      // Costruisci query update
-      const updates: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
+      // Costruisci oggetto update
+      const updates: any = {};
 
-      if (email) { updates.push(`email = $${paramIndex++}`); values.push(email); }
-      if (firstName) { updates.push(`first_name = $${paramIndex++}`); values.push(firstName); }
-      if (lastName) { updates.push(`last_name = $${paramIndex++}`); values.push(lastName); }
-      if (phone !== undefined) { updates.push(`phone = $${paramIndex++}`); values.push(phone); }
-      // Aggiorna password hash se cambiata
-      if (newPassword) { updates.push(`password_hash = $${paramIndex++}`); values.push(passwordHash); }
+      if (email) updates.email = email;
+      if (firstName) updates.first_name = firstName;
+      if (lastName) updates.last_name = lastName;
+      if (phone !== undefined) updates.phone = phone;
+      if (newPassword) updates.password_hash = passwordHash;
 
-      if (updates.length === 0) {
+      if (Object.keys(updates).length === 0) {
         return res.status(400).json({ error: 'Nessun dato da aggiornare' });
       }
 
-      values.push(userId);
-      const updateResult = await pool.query(
-        `UPDATE users 
-         SET ${updates.join(', ')} 
-         WHERE id = $${paramIndex} 
-         RETURNING id, email, first_name, last_name, phone, role, created_at`,
-        values
-      );
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update(updates)
+        .eq('id', userId)
+        .select('id, email, first_name, last_name, phone, role, created_at')
+        .single();
 
-      const updatedUser = updateResult.rows[0];
+      if (updateError) throw updateError;
 
       res.json({
         message: 'Profilo aggiornato con successo',
@@ -139,4 +144,5 @@ router.patch(
 );
 
 export default router;
+
 

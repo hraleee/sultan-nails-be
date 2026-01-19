@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import { pool } from '../db/connection';
+import { supabase } from '../db/connection';
 import nodemailer from 'nodemailer';
 
 const router = express.Router();
@@ -26,27 +26,41 @@ router.post(
       const { email, password, firstName, lastName, phone } = req.body;
 
       // Check if user already exists
-      const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-      if (existingUser.rows.length > 0) {
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (existingUser) {
         return res.status(400).json({ error: 'Email già registrata' });
       }
 
       // Hash password
       const passwordHash = await bcrypt.hash(password, 10);
 
-      // Insert user
-      // Insert user
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
 
-      const result = await pool.query(
-        `INSERT INTO users (email, password_hash, first_name, last_name, phone, role, is_verified, verification_code, verification_expires_at)
-         VALUES ($1, $2, $3, $4, $5, 'user', FALSE, $6, $7)
-         RETURNING id, email, first_name, last_name, role`,
-        [email, passwordHash, firstName, lastName, phone || null, otp, expiresAt]
-      );
+      const { data: user, error: insertError } = await supabase
+        .from('users')
+        .insert({
+          email,
+          password_hash: passwordHash,
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone || null,
+          role: 'user',
+          is_verified: false,
+          verification_code: otp,
+          verification_expires_at: expiresAt
+        })
+        .select('id, email, first_name, last_name, role')
+        .single();
 
-      const user = result.rows[0];
+      if (insertError) {
+        throw insertError;
+      }
 
       // Send Verification Email
       try {
@@ -82,12 +96,10 @@ router.post(
         }
       } catch (error) {
         console.error("Error sending verification email:", error);
-        // Continue anyway, user can resend later (if we implement resend) or contact support
       }
 
       res.status(201).json({
         message: 'Registrazione iniziata. Controlla la tua email per il codice di verifica.',
-        // No token returned yet
       });
     } catch (error) {
       console.error('Registration error:', error);
@@ -101,22 +113,26 @@ router.post('/verify', async (req: Request, res: Response) => {
   try {
     const { email, otp } = req.body;
 
-    const result = await pool.query(
-      `SELECT * FROM users WHERE email = $1 AND verification_code = $2`,
-      [email, otp]
-    );
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('verification_code', otp)
+      .maybeSingle();
 
-    if (result.rows.length === 0) {
+    if (error || !user) {
       return res.status(400).json({ error: 'Codice non valido' });
     }
 
-    const user = result.rows[0];
-
     // Mark as verified
-    await pool.query(
-      `UPDATE users SET is_verified = TRUE, verification_code = NULL, verification_expires_at = NULL WHERE id = $1`,
-      [user.id]
-    );
+    await supabase
+      .from('users')
+      .update({
+        is_verified: true,
+        verification_code: null,
+        verification_expires_at: null
+      })
+      .eq('id', user.id);
 
     // Login user (Generate JWT)
     const jwtSecret = process.env.JWT_SECRET;
@@ -163,16 +179,15 @@ router.post(
       const { email, password } = req.body;
 
       // Find user
-      const result = await pool.query(
-        'SELECT id, email, password_hash, first_name, last_name, role, is_verified FROM users WHERE email = $1',
-        [email]
-      );
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('id, email, password_hash, first_name, last_name, role, is_verified')
+        .eq('email', email)
+        .maybeSingle();
 
-      if (result.rows.length === 0) {
+      if (error || !user) {
         return res.status(401).json({ error: 'Credenziali non valide' });
       }
-
-      const user = result.rows[0];
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password_hash);
@@ -223,34 +238,33 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email richiesta' });
     }
 
-    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-    if (rows.length === 0) {
-      // Security: Don't reveal if user exists. Fake success.
-      // But for this use case, we might want to be helpful or silent.
-      // Let's return success to prevent enumeration, but log internally.
-      // Or for a small business app, being explicit is often better for UX.
+    const { data: user } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (!user) {
       return res.status(404).json({ error: 'Utente non trovato' });
     }
 
-    const userId = rows[0].id;
+    const userId = user.id;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
 
-    await pool.query(
-      'INSERT INTO password_resets (user_id, otp_code, expires_at) VALUES ($1, $2, $3)',
-      [userId, otp, expiresAt]
-    );
+    const { error: insertError } = await supabase
+      .from('password_resets')
+      .insert({
+        user_id: userId,
+        otp_code: otp,
+        expires_at: expiresAt
+      });
+
+    if (insertError) throw insertError;
 
     // Send Email
-    // NOTE: This requires environment variables or hardcoded creds (not recommended for prod).
-    // For free Gmail: use App Password.
-    console.log(`[DEBUG] Generated OTP for ${email}: ${otp}`);
-
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.warn('[WARN] No email credentials found (EMAIL_USER/EMAIL_PASS). Skipping email send.');
-      // Return success for testing purposes so the UI moves to the next step
-      // Return success for testing purposes so the UI moves to the next step
-      // return res.json({ message: 'Simulazione: OTP generato (vedi console server)', devOtp: otp });
+      console.warn('[WARN] No email credentials found (EMAIL_USER/EMAIL_PASS).');
       return res.status(500).json({ error: 'Servizio email non configurato' });
     }
 
@@ -284,15 +298,12 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
       res.json({ message: 'Codice OTP inviato per email' });
     } catch (emailError) {
       console.error('Email send failed:', emailError);
-      // Fallback for dev: if it fails, still let them proceed if they have access to logs
-      // returning 500 would block the UI. Let's return 200 but warn.
-      // res.json({ message: 'Errore invio email (vedi logs), ma OTP generato.', devOtp: otp });
       res.status(500).json({ error: 'Errore nell\'invio dell\'email' });
     }
 
   } catch (error) {
     console.error('Forgot password error:', error);
-    res.status(500).json({ error: 'Errore nell\'invio dell\'email' });
+    res.status(500).json({ error: 'Errore nel recupero della password' });
   }
 });
 
@@ -306,35 +317,50 @@ router.post('/reset-password', async (req: Request, res: Response) => {
     }
 
     // Verify User and OTP
-    // Join users to ensure email matches user_id
-    const query = `
-      SELECT pr.* 
-      FROM password_resets pr
-      JOIN users u ON pr.user_id = u.id
-      WHERE u.email = $1 
-        AND pr.otp_code = $2 
-        AND pr.used = FALSE 
-        AND pr.expires_at > NOW()
-      ORDER BY pr.created_at DESC 
-      LIMIT 1
-    `;
+    // We need to join manually or do two queries since Supabase join syntax is specific
+    // Let's first find the user
+    const { data: user } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
 
-    const { rows } = await pool.query(query, [email, otp]);
-
-    if (rows.length === 0) {
-      return res.status(400).json({ error: 'Codice OTP non valido o scaduto' });
+    if (!user) {
+      return res.status(400).json({ error: 'Utente non trovato' });
     }
 
-    const resetRequest = rows[0];
+    // Now find the valid reset token
+    const { data: resetRequest } = await supabase
+      .from('password_resets')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('otp_code', otp)
+      .eq('used', false)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!resetRequest) {
+      return res.status(400).json({ error: 'Codice OTP non valido o scaduto' });
+    }
 
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update password
-    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hashedPassword, resetRequest.user_id]);
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ password_hash: hashedPassword })
+      .eq('id', user.id);
+
+    if (updateError) throw updateError;
 
     // Mark OTP as used
-    await pool.query('UPDATE password_resets SET used = TRUE WHERE id = $1', [resetRequest.id]);
+    await supabase
+      .from('password_resets')
+      .update({ used: true })
+      .eq('id', resetRequest.id);
 
     res.json({ message: 'Password aggiornata con successo' });
 
@@ -345,4 +371,5 @@ router.post('/reset-password', async (req: Request, res: Response) => {
 });
 
 export default router;
+
 

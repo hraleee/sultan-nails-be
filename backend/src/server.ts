@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { pool } from './db/connection';
+import { supabase } from './db/connection';
 import authRoutes from './routes/auth';
 import bookingRoutes from './routes/bookings';
 import adminRoutes from './routes/admin';
@@ -35,13 +35,14 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/services', servicesRoutes);
 
 // Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection error:', err);
-  } else {
-    console.log('✅ Database connected successfully:', res.rows[0]);
-  }
-});
+supabase.from('users').select('count', { count: 'exact', head: true })
+  .then(({ error }: { error: any }) => {
+    if (error) {
+      console.error('❌ Supabase connection error:', error.message);
+    } else {
+      console.log('✅ Supabase connected successfully');
+    }
+  });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

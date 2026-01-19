@@ -1,7 +1,7 @@
 import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticate, AuthRequest } from '../middleware/auth';
-import { pool } from '../db/connection';
+import { supabase } from '../db/connection';
 
 const router = express.Router();
 
@@ -11,26 +11,23 @@ router.use(authenticate);
 // Funzione helper per aggiornare automaticamente le prenotazioni scadute
 const updateExpiredBookings = async (userId?: number) => {
   try {
-    const now = new Date();
-    let query = `
-      UPDATE bookings 
-      SET status = 'completed', updated_at = CURRENT_TIMESTAMP
-      WHERE booking_date < $1 
-      AND status IN ('pending', 'confirmed')
-    `;
-    const params: any[] = [now];
+    const now = new Date().toISOString();
+
+    let query = supabase
+      .from('bookings')
+      .update({ status: 'completed', updated_at: now })
+      .lt('booking_date', now)
+      .in('status', ['pending', 'confirmed']);
 
     if (userId) {
-      query += ` AND user_id = $2`;
-      params.push(userId);
+      query = query.eq('user_id', userId);
     }
 
-    query += ` RETURNING id`;
+    // Note: Supabase update doesn't return rows by default unless .select() is used
+    const { data, error } = await query.select('id');
 
-    const result = await pool.query(query, params);
-
-    if (result.rows.length > 0) {
-      console.log(`✅ Auto-completate ${result.rows.length} prenotazioni scadute`);
+    if (!error && data && data.length > 0) {
+      console.log(`✅ Auto-completate ${data.length} prenotazioni scadute`);
     }
   } catch (error) {
     console.error('Error updating expired bookings:', error);
@@ -43,23 +40,24 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     // Aggiorna automaticamente le prenotazioni scadute dell'utente
     await updateExpiredBookings(req.user!.id);
 
-    const result = await pool.query(
-      `SELECT 
+    const { data: bookings, error } = await supabase
+      .from('bookings')
+      .select(`
         id, 
-        service_name as "serviceName", 
-        service_price as "servicePrice", 
-        booking_date as "bookingDate", 
-        duration_minutes as "durationMinutes", 
+        serviceName:service_name, 
+        servicePrice:service_price, 
+        bookingDate:booking_date, 
+        durationMinutes:duration_minutes, 
         status, 
         notes, 
-        created_at as "createdAt"
-       FROM bookings 
-       WHERE user_id = $1 
-       ORDER BY booking_date DESC`,
-      [req.user!.id]
-    );
+        createdAt:created_at
+      `)
+      .eq('user_id', req.user!.id)
+      .order('booking_date', { ascending: false });
 
-    res.json({ bookings: result.rows });
+    if (error) throw error;
+
+    res.json({ bookings });
   } catch (error) {
     console.error('Get bookings error:', error);
     res.status(500).json({
@@ -96,56 +94,60 @@ router.post(
       // Try to find service by name to get service_id
       let serviceId = null;
       if (serviceName) {
-        const serviceResult = await pool.query(
-          'SELECT id FROM services WHERE name = $1 LIMIT 1',
-          [serviceName]
-        );
-        if (serviceResult.rows.length > 0) {
-          serviceId = serviceResult.rows[0].id;
+        const { data: service } = await supabase
+          .from('services')
+          .select('id')
+          .eq('name', serviceName)
+          .maybeSingle(); // Use maybeSingle to avoid 406 on multiple matches
+
+        if (service) {
+          serviceId = service.id;
         }
       }
 
       // Check for overlapping bookings
-      const existingBookings = await pool.query(
-        `SELECT id FROM bookings 
-         WHERE booking_date = $1 
-         AND status IN ('pending', 'confirmed')
-         LIMIT 1`,
-        [bookingDate]
-      );
+      // We look for any booking at the same exact time
+      const { data: existingBookings } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('booking_date', bookingDate)
+        .in('status', ['pending', 'confirmed'])
+        .limit(1);
 
-      if (existingBookings.rows.length > 0) {
+      if (existingBookings && existingBookings.length > 0) {
         return res.status(400).json({ error: 'Data e ora già prenotate' });
       }
 
-      const result = await pool.query(
-        `INSERT INTO bookings 
-         (user_id, service_id, service_name, service_price, booking_date, duration_minutes, notes, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
-         RETURNING 
-           id, 
-           service_id as "serviceId", 
-           service_name as "serviceName", 
-           service_price as "servicePrice", 
-           booking_date as "bookingDate", 
-           duration_minutes as "durationMinutes", 
-           status, 
-           notes, 
-           created_at as "createdAt"`,
-        [
-          req.user!.id,
-          serviceId,
-          serviceName,
-          servicePrice || null,
-          bookingDate,
-          durationMinutes || 60,
-          notes || null,
-        ]
-      );
+      const { data: booking, error } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: req.user!.id,
+          service_id: serviceId,
+          service_name: serviceName,
+          service_price: servicePrice || null,
+          booking_date: bookingDate,
+          duration_minutes: durationMinutes || 60,
+          notes: notes || null,
+          status: 'pending'
+        })
+        .select(`
+          id, 
+          serviceId:service_id, 
+          serviceName:service_name, 
+          servicePrice:service_price, 
+          bookingDate:booking_date, 
+          durationMinutes:duration_minutes, 
+          status, 
+          notes, 
+          createdAt:created_at
+        `)
+        .single();
+
+      if (error) throw error;
 
       res.status(201).json({
         message: 'Prenotazione creata con successo',
-        booking: result.rows[0],
+        booking,
       });
     } catch (error) {
       console.error('Create booking error:', error);
@@ -162,27 +164,24 @@ router.get('/availability', async (req: AuthRequest, res: Response) => {
     // Aggiorna scadenze
     await updateExpiredBookings();
 
-    let query = `
-      SELECT booking_date, duration_minutes 
-      FROM bookings 
-      WHERE status IN ('pending', 'confirmed')
-    `;
-
-    const params: any[] = [];
+    let query = supabase
+      .from('bookings')
+      .select('booking_date, duration_minutes')
+      .in('status', ['pending', 'confirmed']);
 
     if (from) {
-      query += ` AND booking_date >= $${params.length + 1}`;
-      params.push(from);
+      query = query.gte('booking_date', from);
     }
 
     if (to) {
-      query += ` AND booking_date <= $${params.length + 1}`;
-      params.push(to);
+      query = query.lte('booking_date', to);
     }
 
-    const result = await pool.query(query, params);
+    const { data: slots, error } = await query;
 
-    res.json({ slots: result.rows });
+    if (error) throw error;
+
+    res.json({ slots });
   } catch (error) {
     console.error('Get availability error:', error);
     res.status(500).json({
@@ -195,26 +194,29 @@ router.get('/availability', async (req: AuthRequest, res: Response) => {
 // Ottieni una singola prenotazione
 router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const result = await pool.query(
-      `SELECT 
+    const { data: booking, error } = await supabase
+      .from('bookings')
+      .select(`
         id, 
-        service_name as "serviceName", 
-        service_price as "servicePrice", 
-        booking_date as "bookingDate", 
-        duration_minutes as "durationMinutes", 
+        serviceName:service_name, 
+        servicePrice:service_price, 
+        bookingDate:booking_date, 
+        durationMinutes:duration_minutes, 
         status, 
         notes, 
-        created_at as "createdAt"
-       FROM bookings 
-       WHERE id = $1 AND user_id = $2`,
-      [req.params.id, req.user!.id]
-    );
+        createdAt:created_at
+      `)
+      .eq('id', req.params.id)
+      .eq('user_id', req.user!.id)
+      .maybeSingle();
 
-    if (result.rows.length === 0) {
+    if (error) throw error;
+
+    if (!booking) {
       return res.status(404).json({ error: 'Prenotazione non trovata' });
     }
 
-    res.json({ booking: result.rows[0] });
+    res.json({ booking });
   } catch (error) {
     console.error('Get booking error:', error);
     res.status(500).json({ error: 'Errore nel recupero della prenotazione' });
@@ -224,14 +226,16 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
 // Cancella una prenotazione
 router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const result = await pool.query(
-      `DELETE FROM bookings 
-       WHERE id = $1 AND user_id = $2 
-       RETURNING id`,
-      [req.params.id, req.user!.id]
-    );
+    const { data, error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('user_id', req.user!.id)
+      .select('id'); // Returning id to confirm deletion
 
-    if (result.rows.length === 0) {
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
       return res.status(404).json({ error: 'Prenotazione non trovata' });
     }
 
@@ -241,8 +245,6 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Errore nella cancellazione della prenotazione' });
   }
 });
-
-
 
 // Modifica una prenotazione
 router.patch('/:id',
@@ -263,12 +265,15 @@ router.patch('/:id',
       const userId = req.user!.id;
 
       // Verify ownership and existence
-      const existing = await pool.query(
-        'SELECT * FROM bookings WHERE id = $1 AND user_id = $2',
-        [bookingId, userId]
-      );
+      const { data: existing, error: fetchError } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('id', bookingId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      if (existing.rows.length === 0) {
+      if (fetchError) throw fetchError;
+      if (!existing) {
         return res.status(404).json({ error: 'Prenotazione non trovata' });
       }
 
@@ -280,55 +285,50 @@ router.patch('/:id',
         }
 
         // Check overlap (excluding this booking)
-        const overlap = await pool.query(
-          `SELECT id FROM bookings 
-         WHERE booking_date = $1 
-         AND status IN ('pending', 'confirmed')
-         AND id != $2
-         LIMIT 1`,
-          [bookingDate, bookingId]
-        );
+        const { data: overlap } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('booking_date', bookingDate)
+          .in('status', ['pending', 'confirmed'])
+          .neq('id', bookingId)
+          .limit(1);
 
-        if (overlap.rows.length > 0) {
+        if (overlap && overlap.length > 0) {
           return res.status(400).json({ error: 'Data e ora già occupate' });
         }
       }
 
-      // Build update query dynamically
-      const updates: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
+      // Build update object
+      const updates: any = { updated_at: new Date().toISOString() };
 
-      if (serviceName) { updates.push(`service_name = $${paramIndex++}`); values.push(serviceName); }
-      if (servicePrice !== undefined) { updates.push(`service_price = $${paramIndex++}`); values.push(servicePrice); }
-      if (bookingDate) { updates.push(`booking_date = $${paramIndex++}`); values.push(bookingDate); }
-      if (durationMinutes) { updates.push(`duration_minutes = $${paramIndex++}`); values.push(durationMinutes); }
-      if (notes !== undefined) { updates.push(`notes = $${paramIndex++}`); values.push(notes); }
+      if (serviceName) updates.service_name = serviceName;
+      if (servicePrice !== undefined) updates.service_price = servicePrice;
+      if (bookingDate) updates.booking_date = bookingDate;
+      if (durationMinutes) updates.duration_minutes = durationMinutes;
+      if (notes !== undefined) updates.notes = notes;
 
-      updates.push(`updated_at = CURRENT_TIMESTAMP`);
+      const { data: booking, error: updateError } = await supabase
+        .from('bookings')
+        .update(updates)
+        .eq('id', bookingId)
+        .eq('user_id', userId)
+        .select(`
+          id, 
+          serviceId:service_id, 
+          serviceName:service_name, 
+          servicePrice:service_price, 
+          bookingDate:booking_date, 
+          durationMinutes:duration_minutes, 
+          status, 
+          notes, 
+          createdAt:created_at,
+          updatedAt:updated_at
+        `)
+        .single();
 
-      values.push(bookingId);
-      values.push(userId);
+      if (updateError) throw updateError;
 
-      const result = await pool.query(
-        `UPDATE bookings 
-       SET ${updates.join(', ')}
-       WHERE id = $${paramIndex++} AND user_id = $${paramIndex++}
-       RETURNING 
-         id, 
-         service_id as "serviceId", 
-         service_name as "serviceName", 
-         service_price as "servicePrice", 
-         booking_date as "bookingDate", 
-         duration_minutes as "durationMinutes", 
-         status, 
-         notes, 
-         created_at as "createdAt",
-         updated_at as "updatedAt"`,
-        values
-      );
-
-      res.json({ message: 'Prenotazione aggiornata', booking: result.rows[0] });
+      res.json({ message: 'Prenotazione aggiornata', booking });
     } catch (error) {
       console.error('Update booking error:', error);
       res.status(500).json({ error: 'Errore nella modifica della prenotazione' });
@@ -336,5 +336,6 @@ router.patch('/:id',
   });
 
 export default router;
+
 
 

@@ -1,0 +1,44 @@
+src/middleware/auth.ts(1,49): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/middleware/auth.ts(2,17): error TS7016: Could not find a declaration file for module 'jsonwebtoken'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/jsonwebtoken/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jsonwebtoken` if it exists or add a new declaration (.d.ts) file containing `declare module 'jsonwebtoken';`
+src/middleware/auth.ts(14,23): error TS2339: Property 'headers' does not exist on type 'AuthRequest'.
+src/routes/admin.ts(1,35): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/routes/admin.ts(37,38): error TS2339: Property 'query' does not exist on type 'AuthRequest'.
+src/routes/admin.ts(107,94): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/routes/admin.ts(179,30): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/routes/admin.ts(180,26): error TS2339: Property 'params' does not exist on type 'AuthRequest'.
+src/routes/auth.ts(1,44): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/routes/auth.ts(2,20): error TS7016: Could not find a declaration file for module 'bcryptjs'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/bcryptjs/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/bcryptjs` if it exists or add a new declaration (.d.ts) file containing `declare module 'bcryptjs';`
+src/routes/auth.ts(3,17): error TS7016: Could not find a declaration file for module 'jsonwebtoken'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/jsonwebtoken/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jsonwebtoken` if it exists or add a new declaration (.d.ts) file containing `declare module 'jsonwebtoken';`
+src/routes/auth.ts(6,24): error TS7016: Could not find a declaration file for module 'nodemailer'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/nodemailer/lib/nodemailer.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/nodemailer` if it exists or add a new declaration (.d.ts) file containing `declare module 'nodemailer';`
+src/routes/bookings.ts(1,35): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/routes/bookings.ts(86,86): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/routes/bookings.ts(162,30): error TS2339: Property 'query' does not exist on type 'AuthRequest'.
+src/routes/bookings.ts(209,21): error TS2339: Property 'params' does not exist on type 'AuthRequest'.
+src/routes/bookings.ts(232,21): error TS2339: Property 'params' does not exist on type 'AuthRequest'.
+src/routes/bookings.ts(263,86): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/routes/bookings.ts(264,29): error TS2339: Property 'params' does not exist on type 'AuthRequest'.
+src/routes/services.ts(1,35): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/routes/services.ts(64,76): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/routes/services.ts(108,26): error TS2339: Property 'params' does not exist on type 'AuthRequest'.
+src/routes/services.ts(109,76): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/routes/services.ts(153,24): error TS2339: Property 'params' does not exist on type 'AuthRequest'.
+src/routes/user.ts(1,35): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/routes/user.ts(2,20): error TS7016: Could not find a declaration file for module 'bcryptjs'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/bcryptjs/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/bcryptjs` if it exists or add a new declaration (.d.ts) file containing `declare module 'bcryptjs';`
+src/routes/user.ts(61,87): error TS2339: Property 'body' does not exist on type 'AuthRequest'.
+src/server.ts(1,21): error TS7016: Could not find a declaration file for module 'express'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/express/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/express` if it exists or add a new declaration (.d.ts) file containing `declare module 'express';`
+src/server.ts(2,18): error TS7016: Could not find a declaration file for module 'cors'. 'C:/Users/User/Desktop/Progetti-personali/sultan-nails/backend/node_modules/cors/lib/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/cors` if it exists or add a new declaration (.d.ts) file containing `declare module 'cors';`
+src/server.ts(26,21): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/server.ts(26,26): error TS7006: Parameter 'res' implicitly has an 'any' type.
