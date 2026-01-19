@@ -89,7 +89,7 @@ export default function BookingModal({
     try {
       if (booking) {
         // Update existing booking status
-        await adminApi.updateBookingStatus(booking.id, formData.status);
+        await adminApi.updateBookingStatus(booking.id, formData.status as any);
       } else {
         // Create new booking - need userId and serviceId
         if (!formData.userId) {
