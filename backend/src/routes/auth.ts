@@ -11,10 +11,11 @@ const router = express.Router();
 router.post(
   '/register',
   [
-    body('email').isEmail().normalizeEmail(),
+    body('email').isEmail(),
     body('password').isLength({ min: 6 }),
     body('firstName').trim().notEmpty(),
     body('lastName').trim().notEmpty(),
+    body('phone').optional().trim(),
   ],
   async (req: Request, res: Response) => {
     try {
@@ -166,7 +167,7 @@ router.post('/verify', async (req: Request, res: Response) => {
 router.post(
   '/login',
   [
-    body('email').isEmail().normalizeEmail(),
+    body('email').isEmail(),
     body('password').notEmpty(),
   ],
   async (req: Request, res: Response) => {
