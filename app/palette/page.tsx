@@ -113,13 +113,13 @@ export default function PalettePage() {
         <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-20 pt-8 sm:px-10 lg:px-14">
           {/* Hero Section */}
           <section className="flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.2em] text-fuchsia-100 w-fit">
+            <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/20 bg-purple-500/5 px-4 py-2 text-xs font-light uppercase tracking-[0.2em] text-purple-100 w-fit">
               Palette Colori
             </div>
-            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-              Oltre 120 tonalità selezionate
+            <h1 className="text-4xl font-light tracking-wide leading-tight sm:text-5xl lg:text-6xl text-white">
+              Oltre 120 <span className="text-purple-200 font-thin">tonalità selezionate</span>
             </h1>
-            <p className="max-w-3xl text-lg text-white/80 sm:text-xl">
+            <p className="max-w-3xl text-lg text-white/70 font-light sm:text-xl leading-relaxed">
               Pigmenti premium certificati EU, aggiornati ogni stagione. Ogni
               colore è testato per garantire fedeltà cromatica e durata
               eccezionale.
@@ -129,10 +129,10 @@ export default function PalettePage() {
           {/* Finishes Section */}
           <section className="space-y-6">
             <div>
-              <h2 className="text-3xl font-semibold mb-2">
+              <h2 className="text-3xl font-light tracking-wide mb-2 text-white">
                 Finiture disponibili
               </h2>
-              <p className="text-white/70">
+              <p className="text-white/60 font-light">
                 Scegli l'effetto perfetto per il tuo stile
               </p>
             </div>
@@ -140,14 +140,14 @@ export default function PalettePage() {
               {finishes.map((finish) => (
                 <div
                   key={finish.name}
-                  className="group rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-fuchsia-400/40 hover:bg-white/8"
+                  className="group rounded-2xl border border-purple-200/10 bg-purple-500/5 p-6 transition hover:-translate-y-1 hover:border-purple-200/30 hover:bg-purple-500/10"
                 >
-                  <div className="text-4xl mb-3">{finish.icon}</div>
-                  <h3 className="text-xl font-semibold mb-2">{finish.name}</h3>
-                  <p className="text-white/75 text-sm mb-2">
+                  <div className="text-4xl mb-3 grayscale brightness-125 opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition">{finish.icon}</div>
+                  <h3 className="text-xl font-light text-purple-50 tracking-wide mb-2">{finish.name}</h3>
+                  <p className="text-white/70 font-light text-sm mb-2 leading-relaxed">
                     {finish.description}
                   </p>
-                  <p className="text-xs text-fuchsia-200">{finish.effect}</p>
+                  <p className="text-xs text-purple-200/80 font-medium tracking-wide">{finish.effect}</p>
                 </div>
               ))}
             </div>
@@ -156,10 +156,10 @@ export default function PalettePage() {
           {/* Color Collections */}
           <section className="space-y-8">
             <div>
-              <h2 className="text-3xl font-semibold mb-2">
+              <h2 className="text-3xl font-light tracking-wide mb-2 text-white">
                 Le nostre collezioni
               </h2>
-              <p className="text-white/70">
+              <p className="text-white/60 font-light">
                 Palette cromatiche curate per ogni occasione
               </p>
             </div>
@@ -167,33 +167,33 @@ export default function PalettePage() {
             {collections.map((collection) => (
               <div
                 key={collection.name}
-                className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 space-y-6"
+                className="rounded-3xl border border-purple-200/10 bg-purple-900/5 p-6 sm:p-8 space-y-6 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.4)] backdrop-blur-md"
               >
                 <div>
-                  <h3 className="text-2xl font-semibold mb-2">
+                  <h3 className="text-2xl font-light text-white mb-2 tracking-wide">
                     {collection.name}
                   </h3>
-                  <p className="text-white/70">{collection.description}</p>
+                  <p className="text-white/60 font-light">{collection.description}</p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {collection.colors.map((color) => (
                     <div
                       key={color.name}
-                      className="group rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:-translate-y-1 hover:border-fuchsia-400/40"
+                      className="group rounded-2xl border border-purple-200/10 bg-purple-500/5 p-4 transition hover:-translate-y-1 hover:border-purple-200/30 hover:bg-purple-500/10"
                     >
                       <div
-                        className="w-full h-24 rounded-xl mb-4 border-2 border-white/20 shadow-lg"
+                        className="w-full h-24 rounded-xl mb-4 border border-white/10 shadow-inner"
                         style={{ backgroundColor: color.hex }}
                       />
                       <div className="space-y-1">
-                        <div className="font-semibold text-white">
+                        <div className="font-medium text-white group-hover:text-purple-100 transition">
                           {color.name}
                         </div>
-                        <div className="text-sm text-white/60">
+                        <div className="text-sm text-white/50 font-light">
                           {color.tone}
                         </div>
-                        <div className="text-xs font-mono text-white/40">
+                        <div className="text-xs font-mono text-white/30">
                           {color.hex}
                         </div>
                       </div>
@@ -205,15 +205,15 @@ export default function PalettePage() {
           </section>
 
           {/* Seasonal Updates */}
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-fuchsia-500/15 via-white/5 to-sky-400/20 p-8">
+          <section className="rounded-3xl border border-purple-200/10 bg-gradient-to-r from-purple-500/15 via-white/5 to-sky-400/20 p-8 shadow-inner">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-fuchsia-100">
+              <div className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-3 py-1 text-xs font-light uppercase tracking-wider text-purple-200">
                 Novità
               </div>
-              <h3 className="text-2xl sm:text-3xl font-semibold">
+              <h3 className="text-2xl sm:text-3xl font-light tracking-wide text-white">
                 Collezioni stagionali
               </h3>
-              <p className="text-white/80 max-w-2xl">
+              <p className="text-white/70 font-light max-w-2xl leading-relaxed">
                 Ogni stagione introduciamo nuove tonalità ispirate alle tendenze
                 della moda e del design internazionale. Seguici su Instagram per
                 scoprire in anteprima le novità!
@@ -226,12 +226,12 @@ export default function PalettePage() {
                 ].map((item) => (
                   <div
                     key={item.season}
-                    className="rounded-2xl border border-white/10 bg-white/10 p-4"
+                    className="rounded-2xl border border-purple-200/10 bg-purple-500/10 p-4"
                   >
-                    <div className="font-semibold text-white mb-1">
+                    <div className="font-medium text-purple-100 mb-1">
                       {item.season}
                     </div>
-                    <div className="text-sm text-white/70">{item.colors}</div>
+                    <div className="text-sm text-white/60 font-light">{item.colors}</div>
                   </div>
                 ))}
               </div>
@@ -239,12 +239,12 @@ export default function PalettePage() {
           </section>
 
           {/* Custom Color Mixing */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-8 space-y-6">
+          <section className="rounded-3xl border border-purple-200/10 bg-purple-900/5 p-8 space-y-6">
             <div>
-              <h3 className="text-2xl sm:text-3xl font-semibold mb-3">
+              <h3 className="text-2xl sm:text-3xl font-light tracking-wide mb-3 text-white">
                 Non trovi il colore perfetto?
               </h3>
-              <p className="text-white/80 max-w-2xl">
+              <p className="text-white/70 font-light max-w-2xl leading-relaxed">
                 Possiamo creare miscele personalizzate per te! Porta una foto o
                 un campione del colore desiderato e lo riprodurremo con i nostri
                 pigmenti premium.
@@ -271,39 +271,39 @@ export default function PalettePage() {
               ].map((feature) => (
                 <div
                   key={feature.title}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                  className="rounded-2xl border border-purple-200/10 bg-purple-500/5 p-5 transition hover:bg-purple-500/10"
                 >
-                  <div className="text-3xl mb-3">{feature.icon}</div>
-                  <h4 className="font-semibold text-white mb-2">
+                  <div className="text-3xl mb-3 grayscale brightness-125 opacity-80">{feature.icon}</div>
+                  <h4 className="font-medium text-purple-100 mb-2">
                     {feature.title}
                   </h4>
-                  <p className="text-sm text-white/70">{feature.desc}</p>
+                  <p className="text-sm text-white/60 font-light">{feature.desc}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* CTA Final */}
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-fuchsia-500/15 via-white/5 to-sky-400/20 p-8 text-center">
-            <h3 className="text-3xl font-semibold mb-4">
+          <section className="rounded-3xl border border-purple-200/10 bg-gradient-to-r from-purple-500/15 via-purple-900/20 to-sky-400/20 p-8 text-center shadow-[0_20px_80px_-40px_rgba(0,0,0,0.4)] backdrop-blur-md">
+            <h3 className="text-3xl font-light tracking-wide mb-4 text-white">
               Vuoi vedere i colori dal vivo?
             </h3>
-            <p className="text-white/80 mb-6 max-w-2xl mx-auto">
+            <p className="text-white/70 font-light mb-6 max-w-2xl mx-auto leading-relaxed">
               Prenota un appuntamento per una consulenza colore gratuita. Ti
               mostreremo la palette completa e ti aiuteremo a scegliere!
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a
-                href="https://wa.me/393401234567"
+                href="https://wa.me/393391862999"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-fuchsia-500/40 transition hover:-translate-y-1 hover:shadow-fuchsia-500/60"
+                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all"
               >
                 Prenota consulenza
               </a>
               <a
                 href="/servizi"
-                className="rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/20"
+                className="rounded-full border border-purple-200/30 bg-purple-500/10 px-8 py-4 text-base font-medium text-white transition hover:border-purple-200/50 hover:bg-purple-500/20"
               >
                 Vedi i servizi
               </a>

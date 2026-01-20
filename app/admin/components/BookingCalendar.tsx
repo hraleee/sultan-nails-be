@@ -126,31 +126,28 @@ export default function BookingCalendar({
         <div className="flex gap-2">
           <button
             onClick={() => setView("month")}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              view === "month"
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === "month"
                 ? "bg-fuchsia-500/20 text-fuchsia-300"
                 : "bg-white/5 text-white/60 hover:bg-white/10"
-            }`}
+              }`}
           >
             Mese
           </button>
           <button
             onClick={() => setView("week")}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              view === "week"
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === "week"
                 ? "bg-fuchsia-500/20 text-fuchsia-300"
                 : "bg-white/5 text-white/60 hover:bg-white/10"
-            }`}
+              }`}
           >
             Settimana
           </button>
           <button
             onClick={() => setView("day")}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              view === "day"
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === "day"
                 ? "bg-fuchsia-500/20 text-fuchsia-300"
                 : "bg-white/5 text-white/60 hover:bg-white/10"
-            }`}
+              }`}
           >
             Giorno
           </button>
@@ -180,20 +177,18 @@ export default function BookingCalendar({
                 <div
                   key={idx}
                   onClick={() => handleDateClick(day)}
-                  className={`min-h-[100px] cursor-pointer rounded-xl border p-2 transition hover:border-fuchsia-400/50 ${
-                    isCurrentMonth
+                  className={`min-h-[100px] cursor-pointer rounded-xl border p-2 transition hover:border-fuchsia-400/50 ${isCurrentMonth
                       ? "border-white/10 bg-white/5"
                       : "border-white/5 bg-white/[0.02] opacity-50"
-                  } ${isCurrentDay ? "ring-2 ring-fuchsia-400/50" : ""}`}
+                    } ${isCurrentDay ? "ring-2 ring-fuchsia-400/50" : ""}`}
                 >
                   <div
-                    className={`mb-1 text-sm font-semibold ${
-                      isCurrentDay
+                    className={`mb-1 text-sm font-semibold ${isCurrentDay
                         ? "text-fuchsia-300"
                         : isCurrentMonth
-                        ? "text-white"
-                        : "text-white/40"
-                    }`}
+                          ? "text-white"
+                          : "text-white/40"
+                      }`}
                   >
                     {format(day, "d")}
                   </div>
@@ -205,15 +200,14 @@ export default function BookingCalendar({
                           e.stopPropagation();
                           onBookingClick(booking);
                         }}
-                        className={`truncate rounded px-2 py-1 text-xs font-medium ${
-                          booking.status === "confirmed"
+                        className={`truncate rounded px-2 py-1 text-xs font-medium ${booking.status === "confirmed"
                             ? "bg-green-500/20 text-green-300"
                             : booking.status === "completed"
-                            ? "bg-blue-500/20 text-blue-300"
-                            : booking.status === "cancelled"
-                            ? "bg-red-500/20 text-red-300"
-                            : "bg-yellow-500/20 text-yellow-300"
-                        }`}
+                              ? "bg-blue-500/20 text-blue-300"
+                              : booking.status === "cancelled"
+                                ? "bg-red-500/20 text-red-300"
+                                : "bg-yellow-500/20 text-yellow-300"
+                          }`}
                       >
                         {format(parseISO(booking.booking_date), "HH:mm")} - {booking.service_name}
                       </div>
@@ -279,15 +273,14 @@ export default function BookingCalendar({
                             <div
                               key={booking.id}
                               onClick={() => onBookingClick(booking)}
-                              className={`cursor-pointer rounded-xl border p-4 transition hover:scale-[1.02] ${
-                                booking.status === "confirmed"
+                              className={`cursor-pointer rounded-xl border p-4 transition hover:scale-[1.02] ${booking.status === "confirmed"
                                   ? "border-green-500/30 bg-green-500/10"
                                   : booking.status === "completed"
-                                  ? "border-blue-500/30 bg-blue-500/10"
-                                  : booking.status === "cancelled"
-                                  ? "border-red-500/30 bg-red-500/10"
-                                  : "border-yellow-500/30 bg-yellow-500/10"
-                              }`}
+                                    ? "border-blue-500/30 bg-blue-500/10"
+                                    : booking.status === "cancelled"
+                                      ? "border-red-500/30 bg-red-500/10"
+                                      : "border-yellow-500/30 bg-yellow-500/10"
+                                }`}
                             >
                               <div className="flex items-center justify-between">
                                 <div>
@@ -298,15 +291,14 @@ export default function BookingCalendar({
                                   <p className="text-xs text-white/50">{booking.email}</p>
                                 </div>
                                 <span
-                                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                    booking.status === "confirmed"
+                                  className={`rounded-full px-3 py-1 text-xs font-semibold ${booking.status === "confirmed"
                                       ? "bg-green-500/20 text-green-300"
                                       : booking.status === "completed"
-                                      ? "bg-blue-500/20 text-blue-300"
-                                      : booking.status === "cancelled"
-                                      ? "bg-red-500/20 text-red-300"
-                                      : "bg-yellow-500/20 text-yellow-300"
-                                  }`}
+                                        ? "bg-blue-500/20 text-blue-300"
+                                        : booking.status === "cancelled"
+                                          ? "bg-red-500/20 text-red-300"
+                                          : "bg-yellow-500/20 text-yellow-300"
+                                    }`}
                                 >
                                   {booking.status === "pending" && "In attesa"}
                                   {booking.status === "confirmed" && "Confermata"}
@@ -351,11 +343,10 @@ export default function BookingCalendar({
               {weekDays.map((day) => (
                 <div
                   key={day.toString()}
-                  className={`text-center ${
-                    isToday(day)
+                  className={`text-center ${isToday(day)
                       ? "text-fuchsia-300 font-bold"
                       : "text-white/70"
-                  }`}
+                    }`}
                 >
                   <div className="text-xs uppercase">
                     {format(day, "EEE", { locale: it })}
@@ -395,15 +386,14 @@ export default function BookingCalendar({
                                 <div
                                   key={booking.id}
                                   onClick={() => onBookingClick(booking)}
-                                  className={`cursor-pointer rounded px-2 py-1 text-xs font-medium transition hover:scale-105 ${
-                                    booking.status === "confirmed"
+                                  className={`cursor-pointer rounded px-2 py-1 text-xs font-medium transition hover:scale-105 ${booking.status === "confirmed"
                                       ? "bg-green-500/20 text-green-300 border border-green-500/30"
                                       : booking.status === "completed"
-                                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                                      : booking.status === "cancelled"
-                                      ? "bg-red-500/20 text-red-300 border border-red-500/30"
-                                      : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
-                                  }`}
+                                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                        : booking.status === "cancelled"
+                                          ? "bg-red-500/20 text-red-300 border border-red-500/30"
+                                          : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
+                                    }`}
                                 >
                                   <div className="truncate font-semibold">
                                     {format(setHours(new Date(), hour), "HH:mm")}

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { supabase } from './db/connection';
+import { schedulerService } from './services/cron';
 import authRoutes from './routes/auth';
 import bookingRoutes from './routes/bookings';
 import adminRoutes from './routes/admin';
@@ -34,6 +35,17 @@ app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', servicesRoutes);
 
+// Debug Route for Reminders
+app.get('/api/debug/trigger-reminders', async (req, res) => {
+  try {
+    const { date } = req.query;
+    await schedulerService.runNow(date as string);
+    res.json({ message: 'Promemoria inviati (controlla i log server e le email)' });
+  } catch (error) {
+    res.status(500).json({ error: 'Errore esecuzione promemoria' });
+  }
+});
+
 // Test database connection
 supabase.from('users').select('count', { count: 'exact', head: true })
   .then(({ error }: { error: any }) => {
@@ -47,6 +59,7 @@ supabase.from('users').select('count', { count: 'exact', head: true })
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  schedulerService.init();
 });
 
 export default app;

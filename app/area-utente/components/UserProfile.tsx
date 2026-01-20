@@ -91,59 +91,59 @@ export default function UserProfile({ userData, onUpdate }: UserProfileProps) {
         <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
             {/* Header */}
             <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent mb-2">
+                <h2 className="text-3xl font-light tracking-wide bg-gradient-to-r from-purple-100 to-white bg-clip-text text-transparent mb-2">
                     Il Tuo Profilo
                 </h2>
-                <p className="text-white/40">Gestisci le tue informazioni personali e di accesso</p>
+                <p className="text-white/40 font-light">Gestisci le tue informazioni personali e di accesso</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm space-y-8">
+            <form onSubmit={handleSubmit} className="bg-purple-500/5 border border-purple-200/10 rounded-3xl p-8 backdrop-blur-sm space-y-8">
 
                 {/* Personal Info Section */}
                 <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-white/90 border-b border-white/10 pb-4">Dati Personali</h3>
+                    <h3 className="text-xl font-medium text-white/90 border-b border-white/5 pb-4 tracking-wide">Dati Personali</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60 ml-1">Nome</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Nome</label>
                             <input
                                 type="text"
                                 name="firstName"
                                 value={formData.firstName}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="Il tuo nome"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60 ml-1">Cognome</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Cognome</label>
                             <input
                                 type="text"
                                 name="lastName"
                                 value={formData.lastName}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="Il tuo cognome"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60 ml-1">Email</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="tua@email.com"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60 ml-1">Telefono</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Telefono</label>
                             <input
                                 type="tel"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="+39 ..."
                             />
                         </div>
@@ -152,40 +152,40 @@ export default function UserProfile({ userData, onUpdate }: UserProfileProps) {
 
                 {/* Password Section */}
                 <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-white/90 border-b border-white/10 pb-4 pt-4">Sicurezza</h3>
-                    <p className="text-sm text-white/40 mb-4">Compila solo se desideri modificare la tua password attuale.</p>
+                    <h3 className="text-xl font-medium text-white/90 border-b border-white/5 pb-4 pt-4 tracking-wide">Sicurezza</h3>
+                    <p className="text-sm text-white/40 mb-4 font-light">Compila solo se desideri modificare la tua password attuale.</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm text-white/60 ml-1">Password Attuale (Richiesta per modifiche password)</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Password Attuale (Richiesta per modifiche password)</label>
                             <input
                                 type="password"
                                 name="currentPassword"
                                 value={formData.currentPassword}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="Inserisci la password attuale"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60 ml-1">Nuova Password</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Nuova Password</label>
                             <input
                                 type="password"
                                 name="newPassword"
                                 value={formData.newPassword}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="Minimo 6 caratteri"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60 ml-1">Conferma Nuova Password</label>
+                            <label className="text-sm text-white/60 ml-1 font-light">Conferma Nuova Password</label>
                             <input
                                 type="password"
                                 name="confirmNewPassword"
                                 value={formData.confirmNewPassword}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-black/30 transition shadow-inner"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-400/50 focus:bg-black/50 transition shadow-inner font-light placeholder:text-white/20"
                                 placeholder="Ripeti nuova password"
                             />
                         </div>
@@ -195,8 +195,8 @@ export default function UserProfile({ userData, onUpdate }: UserProfileProps) {
                 {/* Feedback Message */}
                 {message && (
                     <div className={`p-4 rounded-xl text-sm font-medium ${message.type === 'success'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                        : 'bg-red-500/10 text-red-300 border border-red-500/20'
                         }`}>
                         {message.text}
                     </div>
@@ -207,7 +207,7 @@ export default function UserProfile({ userData, onUpdate }: UserProfileProps) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-8 py-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white font-semibold hover:from-fuchsia-500 hover:to-purple-500 focus:ring-2 focus:ring-fuchsia-500/50 transition shadow-lg shadow-fuchsia-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white font-semibold hover:from-purple-400 hover:to-fuchsia-500 focus:ring-2 focus:ring-purple-500/50 transition shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Salvataggio...' : 'Salva Modifiche'}
                     </button>

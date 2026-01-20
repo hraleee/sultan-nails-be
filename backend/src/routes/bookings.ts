@@ -2,6 +2,7 @@ import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { supabase } from '../db/connection';
+import { emailService } from '../services/email';
 
 const router = express.Router();
 
@@ -145,6 +146,27 @@ router.post(
 
       if (error) throw error;
 
+      // Fetch user details for email
+      const { data: userDetails } = await supabase
+        .from('users')
+        .select('email, first_name, last_name')
+        .eq('id', req.user!.id)
+        .single();
+
+      if (userDetails) {
+        const emailUser = {
+          firstName: userDetails.first_name,
+          lastName: userDetails.last_name,
+          email: userDetails.email
+        };
+
+        // Notify User
+        await emailService.sendUserBookingCreatedEmail(userDetails.email, booking);
+
+        // Notify Admin
+        await emailService.sendAdminNewBookingEmail(emailUser, booking);
+      }
+
       res.status(201).json({
         message: 'Prenotazione creata con successo',
         booking,
@@ -226,17 +248,51 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
 // Cancella una prenotazione
 router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const { data, error } = await supabase
+    // 1. Fetch details BEFORE deleting
+    // We need booking info AND user info
+    const { data: bookingData, error: fetchError } = await supabase
       .from('bookings')
-      .delete()
+      .select(`
+        *,
+        users (
+          first_name,
+          last_name,
+          email
+        )
+      `)
       .eq('id', req.params.id)
       .eq('user_id', req.user!.id)
-      .select('id'); // Returning id to confirm deletion
+      .maybeSingle();
 
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
+    if (fetchError) throw fetchError;
+    if (!bookingData) {
       return res.status(404).json({ error: 'Prenotazione non trovata' });
+    }
+
+    // 2. Delete the booking
+    const { error: deleteError } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (deleteError) throw deleteError;
+
+    // 3. Send Emails (Fire and forget)
+    // Extract user data from the joined query
+    const userDetails = bookingData.users as any; // Cast because of the join structure
+
+    if (userDetails) {
+      const emailUser = {
+        firstName: userDetails.first_name,
+        lastName: userDetails.last_name,
+        email: userDetails.email
+      };
+
+      // Notify User
+      await emailService.sendUserBookingCancelledEmail(userDetails.email, bookingData);
+
+      // Notify Admin
+      await emailService.sendAdminBookingCancelledEmail(emailUser, bookingData);
     }
 
     res.json({ message: 'Prenotazione cancellata con successo' });

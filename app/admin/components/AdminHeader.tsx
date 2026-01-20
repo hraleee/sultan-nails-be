@@ -35,13 +35,9 @@ export default function AdminHeader() {
       <header className="fixed left-0 right-0 top-0 z-[999] border-b border-white/10 bg-gradient-to-b from-black/80 via-black/90 to-black/95 backdrop-blur-xl shadow-2xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-fuchsia-400/90 to-sky-400/90 shadow-xl shadow-fuchsia-500/50" />
-            <div>
-              <div className="text-xs uppercase tracking-[0.25em] text-fuchsia-100">
-                Sultan
-              </div>
-              <div className="text-sm font-bold text-white">Admin Panel</div>
-            </div>
+            <span className="text-xl font-light tracking-widest bg-gradient-to-r from-purple-200 to-fuchsia-200 bg-clip-text text-transparent uppercase">
+              Sultan Nails
+            </span>
           </div>
           <div className="h-10 w-24 rounded-full bg-white/5" />
         </div>

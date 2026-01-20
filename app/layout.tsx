@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sultan Nails | Estetica unghie e skin spa",
   description:
-    "Trattamenti unghie signature, manicure, pedicure e rituali spa su misura a Brescia.",
+    "Trattamenti unghie signature, manicure, pedicure e rituali spa su misura a Napoli.",
 };
 
 export default function RootLayout({

@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import { supabase } from '../db/connection';
-import nodemailer from 'nodemailer';
+import { emailService } from '../services/email';
 
 const router = express.Router();
 
@@ -64,40 +64,11 @@ router.post(
       }
 
       // Send Verification Email
-      try {
-        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-          const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS
-            }
-          });
+      // Send Verification Email
+      await emailService.sendVerificationEmail(email, otp);
 
-          const verificationLink = `${process.env.FRONTEND_URL}/verify?email=${encodeURIComponent(email)}&code=${otp}`;
-
-          const mailOptions = {
-            from: 'Sultan Nails <noreply@sultannails.com>',
-            to: email,
-            subject: 'Verifica la tua email - Sultan Nails',
-            text: `Clicca qui per verificare la tua email: ${verificationLink}`,
-            html: `
-              <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                <h2 style="color: #d946ef;">Sultan Nails</h2>
-                <p>Grazie per esserti registrato!</p>
-                <p>Per attivare il tuo account, clicca sul pulsante qui sotto:</p>
-                <a href="${verificationLink}" style="background-color: #d946ef; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin: 10px 0;">Verifica Email</a>
-                <p style="font-size: 14px; color: #666;">Oppure copia questo link: <br> ${verificationLink}</p>
-              </div>
-            `
-          };
-          await transporter.sendMail(mailOptions);
-        } else {
-          console.log(`[DEV] Verification Link for ${email}: ${process.env.FRONTEND_URL}/verify?email=${email}&code=${otp}`);
-        }
-      } catch (error) {
-        console.error("Error sending verification email:", error);
-      }
+      // Notify Admin
+      await emailService.sendAdminNewRegistrationEmail(email, firstName, lastName);
 
       res.status(201).json({
         message: 'Registrazione iniziata. Controlla la tua email per il codice di verifica.',
@@ -201,6 +172,11 @@ router.post(
         return res.status(403).json({ error: 'Email non verificata. Controlla la tua casella di posta.' });
       }
 
+      // Check if Banned
+      if (user.role === 'banned') {
+        return res.status(403).json({ error: 'Il tuo account è stato sospeso. Contatta l\'amministrazione.' });
+      }
+
       // Generate JWT
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
@@ -264,43 +240,8 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
     if (insertError) throw insertError;
 
     // Send Email
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.warn('[WARN] No email credentials found (EMAIL_USER/EMAIL_PASS).');
-      return res.status(500).json({ error: 'Servizio email non configurato' });
-    }
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-
-    const mailOptions = {
-      from: 'Sultan Nails <noreply@sultannails.com>',
-      to: email,
-      subject: 'Codice di Recupero Password - Sultan Nails',
-      text: `Il tuo codice di recupero è: ${otp}\n\nIl codice scade tra 15 minuti.`,
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-          <h2 style="color: #d946ef;">Sultan Nails</h2>
-          <p>Hai richiesto il ripristino della password.</p>
-          <p>Il tuo codice OTP è:</p>
-          <h1 style="background: #fff; padding: 10px; display: inline-block; border-radius: 8px; border: 1px solid #ddd;">${otp}</h1>
-          <p>Il codice è valido per 15 minuti.</p>
-          <p style="font-size: 12px; color: #666;">Se non hai richiesto questo codice, ignora questa email.</p>
-        </div>
-      `
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-      res.json({ message: 'Codice OTP inviato per email' });
-    } catch (emailError) {
-      console.error('Email send failed:', emailError);
-      res.status(500).json({ error: 'Errore nell\'invio dell\'email' });
-    }
+    await emailService.sendPasswordResetEmail(email, otp);
+    res.json({ message: 'Codice OTP inviato per email' });
 
   } catch (error) {
     console.error('Forgot password error:', error);

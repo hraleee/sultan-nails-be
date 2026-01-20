@@ -28,19 +28,19 @@ export default function Header() {
         setUser(null);
       }
     };
-    
+
     checkAuth();
-    
+
     // Listen to storage changes (for logout in other tabs)
     const handleStorageChange = () => {
       checkAuth();
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Check on route changes
     const interval = setInterval(checkAuth, 2000);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(interval);
@@ -52,13 +52,9 @@ export default function Header() {
       <header className="fixed left-0 right-0 top-0 z-[999] border-b border-white/10 bg-gradient-to-b from-black/80 via-black/90 to-black/95 backdrop-blur-xl shadow-2xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-fuchsia-400/90 to-sky-400/90 shadow-xl shadow-fuchsia-500/50" />
-            <div>
-              <div className="text-xs uppercase tracking-[0.25em] text-fuchsia-100">
-                Sultan
-              </div>
-              <div className="text-sm font-bold text-white">Nails Studio</div>
-            </div>
+            <span className="text-xl font-light tracking-widest bg-gradient-to-r from-purple-200 to-fuchsia-200 bg-clip-text text-transparent uppercase">
+              Sultan Nails
+            </span>
           </div>
 
           <nav className="hidden items-center gap-5 md:flex">
@@ -74,17 +70,19 @@ export default function Header() {
             {user ? (
               <Link
                 href={user.role === 'admin' ? '/admin' : '/area-utente'}
-                className="rounded-full bg-gradient-to-r from-fuchsia-500 to-rose-500 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-fuchsia-500/40 hover:shadow-fuchsia-500/60 hover:-translate-y-1 transition-all duration-200"
+                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all duration-200"
               >
                 {user.role === 'admin' ? 'Admin' : 'Area Utente'}
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="rounded-full bg-gradient-to-r from-fuchsia-500 to-rose-500 px-6 py-2.5 text-sm font-bold text-white shadow-xl shadow-fuchsia-500/40 hover:shadow-fuchsia-500/60 hover:-translate-y-1 transition-all duration-200"
+                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all duration-200"
               >
                 Accedi
               </Link>
+
+
             )}
           </nav>
 
@@ -166,9 +164,9 @@ export default function Header() {
                     </motion.button>
                   </div>
                   <div className="space-y-1 text-sm text-white/70">
-                    <div>Via Vittoria 18, Brescia</div>
+                    <div>Via Corso Umbero I n 52, Casalnuovo di Napoli</div>
                     <div className="text-xs uppercase tracking-wider text-fuchsia-200/80">
-                      Mar-Sab 10-19
+                      Lun-Ven 9-19
                     </div>
                   </div>
                 </div>
@@ -199,7 +197,7 @@ export default function Header() {
                       whileTap={{ scale: 0.98 }}
                       href={user.role === 'admin' ? '/admin' : '/area-utente'}
                       onClick={close}
-                      className="w-full flex items-center justify-center gap-3 rounded-4xl bg-gradient-to-r from-fuchsia-500 via-rose-500 to-fuchsia-600 px-8 py-6 text-xl font-black text-white shadow-2xl shadow-fuchsia-500/50 hover:shadow-fuchsia-500/70 transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-3 rounded-4xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-6 text-xl font-black text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all duration-300"
                     >
                       {user.role === 'admin' ? 'Admin' : 'Area Utente'}
                     </motion.a>
@@ -209,16 +207,18 @@ export default function Header() {
                       whileTap={{ scale: 0.98 }}
                       href="/login"
                       onClick={close}
-                      className="w-full flex items-center justify-center gap-3 rounded-4xl bg-gradient-to-r from-fuchsia-500 via-rose-500 to-fuchsia-600 px-8 py-6 text-xl font-black text-white shadow-2xl shadow-fuchsia-500/50 hover:shadow-fuchsia-500/70 transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-3 rounded-4xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-6 text-xl font-black text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all duration-300"
                     >
                       Accedi
                     </motion.a>
                   )}
+
+
                   <a
-                    href="tel:+393401234567"
+                    href="tel:+393391862999"
                     className="block w-full rounded-2xl border-2 border-white/30 bg-white/10 px-6 py-4 text-center font-bold text-white backdrop-blur-sm hover:border-white hover:bg-white/20 transition-all duration-200"
                   >
-                    📞 +39 340 123 4567
+                    📞 +39 339 186 2999
                   </a>
                 </div>
               </div>

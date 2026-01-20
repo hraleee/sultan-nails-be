@@ -15,7 +15,7 @@ export default function BookingCalendar({
     refreshTrigger
 }: BookingCalendarProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [view, setView] = useState<"month" | "week" | "day">("month");
+    const [view, setView] = useState<"month" | "day">("month");
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [busySlots, setBusySlots] = useState<Date[]>([]);
     const [myBookings, setMyBookings] = useState<Booking[]>([]);
@@ -111,8 +111,6 @@ export default function BookingCalendar({
             const newDate = subDays(selectedDate || currentDate, 1);
             setCurrentDate(newDate);
             setSelectedDate(newDate);
-        } else if (view === "week") {
-            setCurrentDate(subWeeks(currentDate, 1));
         } else {
             setCurrentDate(subMonths(currentDate, 1));
         }
@@ -123,8 +121,6 @@ export default function BookingCalendar({
             const newDate = addDays(selectedDate || currentDate, 1);
             setCurrentDate(newDate);
             setSelectedDate(newDate);
-        } else if (view === "week") {
-            setCurrentDate(addWeeks(currentDate, 1));
         } else {
             setCurrentDate(addMonths(currentDate, 1));
         }
@@ -139,10 +135,6 @@ export default function BookingCalendar({
     const getDisplayText = () => {
         if (view === "day") {
             return format(selectedDate || currentDate, "EEEE d MMMM yyyy", { locale: it });
-        } else if (view === "week") {
-            const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-            const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
-            return `${format(weekStart, "d MMM", { locale: it })} - ${format(weekEnd, "d MMM yyyy", { locale: it })}`;
         } else {
             return format(currentDate, "MMMM yyyy", { locale: it });
         }
@@ -157,9 +149,9 @@ export default function BookingCalendar({
 
         if (myBooking) {
             return (
-                <div className="rounded-xl border border-fuchsia-400/50 bg-fuchsia-400/10 p-4 relative group">
-                    <div className="text-fuchsia-300 font-semibold text-sm mb-1">La tua prenotazione</div>
-                    <div className="text-white/80 text-xs">{myBooking.serviceName}</div>
+                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4 relative group">
+                    <div className="text-purple-300 font-medium text-sm mb-1">La tua prenotazione</div>
+                    <div className="text-white/80 text-xs font-light">{myBooking.serviceName}</div>
                     <div className="absolute right-2 top-2 hidden group-hover:flex gap-2">
                         {/* Edit Button (Placeholder logic to click slot) */}
                         <button
@@ -185,7 +177,7 @@ export default function BookingCalendar({
 
         if (isClosed) {
             return (
-                <div className="rounded-xl bg-red-500/5 border border-red-500/10 p-4 text-red-400/30 text-sm italic cursor-not-allowed">
+                <div className="rounded-xl bg-red-500/5 border border-red-500/10 p-4 text-red-400/30 text-sm italic cursor-not-allowed font-light">
                     Chiuso
                 </div>
             );
@@ -193,7 +185,7 @@ export default function BookingCalendar({
 
         if (busy) {
             return (
-                <div className="rounded-xl bg-white/5 border border-white/10 p-4 text-white/30 text-sm italic cursor-not-allowed">
+                <div className="rounded-xl bg-white/5 border border-white/5 p-4 text-white/30 text-sm italic cursor-not-allowed font-light">
                     Occupato
                 </div>
             );
@@ -201,7 +193,7 @@ export default function BookingCalendar({
 
         if (isPast) {
             return (
-                <div className="rounded-xl bg-white/5 border border-white/5 p-4 text-white/20 text-sm italic cursor-not-allowed">
+                <div className="rounded-xl bg-white/5 border border-white/5 p-4 text-white/20 text-sm italic cursor-not-allowed font-light">
                     Non disponibile
                 </div>
             );
@@ -210,7 +202,7 @@ export default function BookingCalendar({
         return (
             <button
                 onClick={() => onTimeSlotClick(date)}
-                className="w-full rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/10 p-4 text-fuchsia-300 font-semibold hover:bg-fuchsia-500/20 transition text-left"
+                className="w-full rounded-xl border border-purple-500/30 bg-purple-500/10 p-4 text-purple-300 font-medium hover:bg-purple-500/20 transition text-left"
             >
                 + Prenota
             </button>
@@ -265,19 +257,19 @@ export default function BookingCalendar({
             {/* Controls (Keep existing controls) */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                    <button onClick={handlePrev} className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-white transition hover:bg-white/10">←</button>
-                    <h2 className="text-2xl font-bold text-white min-w-[250px] text-center capitalize">{getDisplayText()}</h2>
-                    <button onClick={handleNext} className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-white transition hover:bg-white/10">→</button>
-                    <button onClick={handleToday} className="rounded-xl border border-fuchsia-400/50 bg-fuchsia-400/10 px-4 py-2 text-sm font-semibold text-fuchsia-300 transition hover:bg-fuchsia-400/20">Oggi</button>
+                    <button onClick={handlePrev} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition hover:bg-white/10">←</button>
+                    <h2 className="text-2xl font-light text-white min-w-[250px] text-center capitalize tracking-wide">{getDisplayText()}</h2>
+                    <button onClick={handleNext} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition hover:bg-white/10">→</button>
+                    {/* <button onClick={handleToday} className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-sm font-medium text-purple-300 transition hover:bg-purple-500/20">Oggi</button> */}
                 </div>
                 <div className="flex gap-2">
-                    {["month", "week", "day"].map((v) => (
+                    {["month", "day"].map((v) => (
                         <button
                             key={v}
                             onClick={() => setView(v as any)}
-                            className={`rounded-xl px-4 py-2 text-sm font-semibold transition capitalize ${view === v ? "bg-fuchsia-500/20 text-fuchsia-300" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
+                            className={`rounded-xl px-4 py-2 text-sm font-medium transition capitalize ${view === v ? "bg-purple-500/20 text-purple-300 border border-purple-500/20" : "bg-white/5 text-white/60 hover:bg-white/10 border border-transparent"}`}
                         >
-                            {v === 'month' ? 'Mese' : v === 'week' ? 'Settimana' : 'Giorno'}
+                            {v === 'month' ? 'Mese' : 'Giorno'}
                         </button>
                     ))}
                 </div>
@@ -287,10 +279,10 @@ export default function BookingCalendar({
 
             {/* Calendar View */}
             {view === "month" && (
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <div className="rounded-3xl border border-purple-200/10 bg-purple-500/5 p-6 backdrop-blur-sm">
                     <div className="mb-4 grid grid-cols-7 gap-2">
                         {["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].map((day) => (
-                            <div key={day} className="py-2 text-center text-sm font-semibold text-white/70">{day}</div>
+                            <div key={day} className="py-2 text-center text-sm font-medium text-white/60 uppercase tracking-widest text-[10px]">{day}</div>
                         ))}
                     </div>
 
@@ -304,21 +296,23 @@ export default function BookingCalendar({
                                 <div
                                     key={idx}
                                     onClick={() => handleDateClick(day)}
-                                    className={`min-h-[100px] cursor-pointer rounded-xl border p-2 transition hover:border-fuchsia-400/50 flex flex-col justify-between ${isCurrentMonth ? "border-white/10 bg-white/5" : "border-white/5 bg-white/[0.02] opacity-50"
-                                        } ${isCurrentDay ? "ring-2 ring-fuchsia-400/50" : ""}`}
+                                    className={`min-h-[80px] sm:min-h-[100px] cursor-pointer rounded-xl border p-2 transition hover:border-purple-400/50 flex flex-col justify-between ${isCurrentMonth ? "border-white/5 bg-black/20" : "border-transparent bg-transparent opacity-30"
+                                        } ${isCurrentDay ? "ring-1 ring-purple-400/50 shadow-[0_0_15px_rgba(168,85,247,0.15)]" : ""}`}
                                 >
-                                    <div className={`mb-1 text-sm font-semibold ${isCurrentDay ? "text-fuchsia-300" : "text-white/80"}`}>
+                                    <div className={`mb-1 text-sm font-medium ${isCurrentDay ? "text-purple-300" : "text-white/60"}`}>
                                         {format(day, "d")}
                                     </div>
 
-                                    {/* Open/Closed logic */}
-                                    <div className="mt-auto text-xs font-semibold text-center py-1 rounded-lg">
-                                        {isWeekendDay ? (
-                                            <span className="text-red-400/80 bg-red-400/10 px-2 py-1 rounded">Chiuso</span>
-                                        ) : (
-                                            <span className="text-emerald-400/80 bg-emerald-400/10 px-2 py-1 rounded">Aperto</span>
-                                        )}
-                                    </div>
+                                    {/* Open/Closed logic - Mobile Optimized */}
+                                    {isCurrentMonth && (
+                                        <div className="mt-auto">
+                                            {isWeekendDay ? (
+                                                <div className="h-1.5 w-full rounded-full bg-red-500/20"></div>
+                                            ) : (
+                                                <div className="h-1.5 w-full rounded-full bg-emerald-500/20"></div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -326,8 +320,8 @@ export default function BookingCalendar({
                 </div>
             )}
 
-            {(view === "day" || view === "week") && (
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 max-h-[600px] overflow-y-auto">
+            {(view === "day") && (
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 max-h-[600px] overflow-y-auto overflow-x-auto">
                     {view === "day" ? (
                         <div className="space-y-4">
                             {timeSlots.map(hour => {
@@ -343,31 +337,35 @@ export default function BookingCalendar({
                             })}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-8 gap-2 min-w-[800px]">
-                            <div className="pt-8 space-y-2">
-                                {timeSlots.map(h => <div key={h} className="h-10 text-xs text-white/50 text-right pr-2 pt-2">{h}:00</div>)}
-                            </div>
-                            {eachDayOfInterval({
-                                start: startOfWeek(currentDate, { weekStartsOn: 1 }),
-                                end: endOfWeek(currentDate, { weekStartsOn: 1 })
-                            }).map(day => (
-                                <div key={day.toString()} className="space-y-2">
-                                    <div className={`text-center mb-2 ${isToday(day) ? 'text-fuchsia-400 font-bold' : 'text-white/70'}`}>
-                                        <div className="text-xs uppercase">{format(day, 'EEE', { locale: it })}</div>
-                                        <div>{format(day, 'd')}</div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {timeSlots.map(hour => {
-                                            const slotDate = setHours(setMinutes(day, 0), hour);
-                                            return (
-                                                <div key={hour} className="h-10">
-                                                    {renderCompactSlot(slotDate)}
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
+                        <div className="min-w-[800px]">
+                            <div className="grid grid-cols-8 gap-2">
+                                {/* Empty corner cell for alignment if needed, or just remove time column */}
+                                <div className="pt-12 space-y-2 border-r border-white/10 pr-2 flex flex-col items-center justify-center">
+                                    <span className="text-xs text-white/30 rotate-180 text-vertical" style={{ writingMode: 'vertical-rl' }}>ORARI</span>
                                 </div>
-                            ))}
+
+                                {eachDayOfInterval({
+                                    start: startOfWeek(currentDate, { weekStartsOn: 1 }),
+                                    end: endOfWeek(currentDate, { weekStartsOn: 1 })
+                                }).map(day => (
+                                    <div key={day.toString()} className="space-y-2 min-w-[100px]">
+                                        <div className={`text-center mb-2 p-2 rounded-lg ${isToday(day) ? 'bg-purple-500/20 text-purple-300 font-bold' : 'text-white/70'}`}>
+                                            <div className="text-xs uppercase tracking-wider">{format(day, 'EEE', { locale: it })}</div>
+                                            <div className="text-lg">{format(day, 'd')}</div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {timeSlots.map(hour => {
+                                                const slotDate = setHours(setMinutes(day, 0), hour);
+                                                return (
+                                                    <div key={hour} className="h-14">
+                                                        {renderCompactSlot(slotDate)}
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

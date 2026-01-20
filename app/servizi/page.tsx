@@ -94,13 +94,13 @@ export default function ServiziPage() {
         <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-20 pt-8 sm:px-10 lg:px-14">
           {/* Hero Section */}
           <section className="flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.2em] text-fuchsia-100 w-fit">
+            <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/20 bg-purple-500/5 px-4 py-2 text-xs font-light uppercase tracking-[0.2em] text-purple-100 w-fit">
               Servizi Premium
             </div>
-            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-              I nostri trattamenti esclusivi
+            <h1 className="text-4xl font-light tracking-wide leading-tight sm:text-5xl lg:text-6xl text-white">
+              I nostri <span className="text-purple-200 font-thin">trattamenti esclusivi</span>
             </h1>
-            <p className="max-w-3xl text-lg text-white/80 sm:text-xl">
+            <p className="max-w-3xl text-lg text-white/70 font-light sm:text-xl leading-relaxed">
               Ogni servizio è pensato per offrirti un'esperienza unica, con
               prodotti di alta qualità, tecniche all'avanguardia e l'attenzione
               ai dettagli che ci contraddistingue.
@@ -113,33 +113,33 @@ export default function ServiziPage() {
               {services.map((service) => (
                 <article
                   key={service.title}
-                  className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg transition hover:-translate-y-1 hover:border-fuchsia-400/40 hover:bg-white/8 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-3xl border border-purple-200/10 bg-purple-500/5 p-6 shadow-lg transition hover:-translate-y-1 hover:border-purple-200/30 hover:bg-purple-500/10 hover:shadow-2xl"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-fuchsia-500/10 opacity-0 transition group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-purple-500/10 opacity-0 transition group-hover:opacity-100" />
                   <div className="relative flex flex-col gap-4">
                     <div className="flex items-start justify-between">
-                      <h2 className="text-2xl font-semibold">
+                      <h2 className="text-2xl font-light tracking-wide text-white">
                         {service.title}
                       </h2>
-                      <span className="rounded-full bg-fuchsia-500/20 px-4 py-2 text-sm font-semibold text-fuchsia-100 whitespace-nowrap">
+                      <span className="rounded-full bg-purple-500/10 border border-purple-200/20 px-4 py-2 text-sm font-medium text-purple-100 whitespace-nowrap">
                         {service.price}
                       </span>
                     </div>
-                    <p className="text-white/75 text-base">
+                    <p className="text-white/60 font-light text-base leading-relaxed">
                       {service.description}
                     </p>
-                    <span className="text-sm font-medium text-fuchsia-200">
+                    <span className="text-sm font-medium text-purple-200">
                       ✨ {service.highlight}
                     </span>
 
                     <div className="mt-2 space-y-2">
-                      <div className="text-sm font-semibold text-white/90">
+                      <div className="text-sm font-medium text-white/80">
                         Include:
                       </div>
-                      <ul className="space-y-1.5 text-sm text-white/70">
+                      <ul className="space-y-1.5 text-sm text-white/60 font-light">
                         {service.details.map((detail, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <span className="text-fuchsia-400 mt-0.5">•</span>
+                            <span className="text-purple-300 mt-0.5">•</span>
                             <span>{detail}</span>
                           </li>
                         ))}
@@ -147,10 +147,10 @@ export default function ServiziPage() {
                     </div>
 
                     <a
-                      href="https://wa.me/393401234567"
+                      href="https://wa.me/393391862999"
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-4 rounded-full bg-gradient-to-r from-fuchsia-500 to-rose-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:-translate-y-0.5 hover:shadow-fuchsia-500/50"
+                      className="mt-4 rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-0.5 hover:shadow-purple-500/50"
                     >
                       Prenota questo servizio
                     </a>
@@ -161,9 +161,9 @@ export default function ServiziPage() {
           </section>
 
           {/* Info Section */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+          <section className="rounded-3xl border border-purple-200/10 bg-purple-900/5 p-8 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.4)] backdrop-blur-md">
             <div className="space-y-4">
-              <h3 className="text-2xl font-semibold">
+              <h3 className="text-2xl font-light tracking-wide text-white">
                 Perché scegliere Sultan Nails?
               </h3>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -201,13 +201,13 @@ export default function ServiziPage() {
                 ].map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                    className="rounded-2xl border border-purple-200/5 bg-purple-500/5 p-5 hover:bg-purple-500/10 transition"
                   >
-                    <div className="text-3xl mb-2">{item.icon}</div>
-                    <div className="font-semibold text-white mb-1">
+                    <div className="text-3xl mb-2 grayscale brightness-125 opacity-80">{item.icon}</div>
+                    <div className="font-medium text-white mb-1">
                       {item.title}
                     </div>
-                    <div className="text-sm text-white/70">{item.desc}</div>
+                    <div className="text-sm text-white/50 font-light">{item.desc}</div>
                   </div>
                 ))}
               </div>
@@ -215,26 +215,26 @@ export default function ServiziPage() {
           </section>
 
           {/* CTA Final */}
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-fuchsia-500/15 via-white/5 to-sky-400/20 p-8 text-center">
-            <h3 className="text-3xl font-semibold mb-4">
+          <section className="rounded-3xl border border-purple-200/10 bg-gradient-to-r from-purple-500/15 via-purple-900/20 to-sky-400/20 p-8 text-center shadow-inner">
+            <h3 className="text-3xl font-light tracking-wide mb-4 text-white">
               Pronta per il tuo prossimo appuntamento?
             </h3>
-            <p className="text-white/80 mb-6 max-w-2xl mx-auto">
+            <p className="text-white/70 font-light mb-6 max-w-2xl mx-auto leading-relaxed">
               Contattaci per prenotare il tuo servizio o per ricevere una
               consulenza personalizzata. Rispondiamo entro poche ore!
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a
-                href="https://wa.me/393401234567"
+                href="https://wa.me/393391862999"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-fuchsia-500/40 transition hover:-translate-y-1 hover:shadow-fuchsia-500/60"
+                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-1 hover:shadow-purple-500/50"
               >
                 Prenota su WhatsApp
               </a>
               <a
-                href="tel:+393401234567"
-                className="rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/20"
+                href="tel:+393391862999"
+                className="rounded-full border border-purple-200/30 bg-purple-500/10 px-8 py-4 text-base font-medium text-white transition hover:border-purple-200/50 hover:bg-purple-500/20"
               >
                 Chiamaci ora
               </a>

@@ -203,11 +203,10 @@ export default function RegisterPage() {
                 placeholder="Ripeti la password"
               />
             </div>
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-500 px-6 py-3 font-bold text-white shadow-xl shadow-fuchsia-500/40 transition hover:-translate-y-0.5 hover:shadow-fuchsia-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 font-bold text-white shadow-xl shadow-purple-500/40 transition hover:-translate-y-0.5 hover:shadow-purple-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Registrazione in corso..." : "Registrati"}
             </button>

@@ -2,6 +2,7 @@ import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
 import { supabase } from '../db/connection';
+import { emailService } from '../services/email';
 
 const router = express.Router();
 
@@ -190,6 +191,32 @@ router.patch(
       // Wait, supabase update response on empty match is empty array, single() throws 'JSON object requested, multiple (or no) rows returned'.
       // So we catch that.
 
+      // Fetch booking details with user email to send notification
+      const { data: bookingDetails } = await supabase
+        .from('bookings')
+        .select(`
+          service_name, 
+          booking_date, 
+          users (email)
+        `)
+        .eq('id', id)
+        .single();
+
+      if (bookingDetails && bookingDetails.users) {
+        const userEmail = Array.isArray(bookingDetails.users)
+          ? bookingDetails.users[0]?.email
+          : (bookingDetails.users as any).email;
+
+        if (userEmail) {
+          // Send notification email
+          await emailService.sendBookingStatusUpdateEmail(
+            userEmail,
+            bookingDetails,
+            status
+          );
+        }
+      }
+
       res.json({
         message: 'Stato prenotazione aggiornato',
         booking,
@@ -207,12 +234,22 @@ router.patch(
 // Ottieni tutti gli utenti (admin)
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
-    const { data: users, error } = await supabase
+    const { data, error } = await supabase
       .from('users')
       .select('id, email, first_name, last_name, phone, role, created_at')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
+
+    const users = data.map((user: any) => ({
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      phone: user.phone,
+      role: user.role,
+      createdAt: user.created_at
+    }));
 
     res.json({ users });
   } catch (error) {
@@ -258,6 +295,104 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Get stats error:', error);
     res.status(500).json({ error: 'Errore nel recupero delle statistiche' });
+  }
+});
+
+// Update User (admin)
+router.put(
+  '/users/:id',
+  [
+    body('firstName').trim().notEmpty(),
+    body('lastName').trim().notEmpty(),
+    body('phone').optional().trim(),
+  ],
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { id } = req.params;
+      const { firstName, lastName, phone } = req.body;
+
+      const { data: user, error } = await supabase
+        .from('users')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone || null
+        })
+        .eq('id', id)
+        .select('id, email, first_name, last_name, phone, role')
+        .single();
+
+      if (error) throw error;
+
+      res.json({
+        message: 'Utente aggiornato con successo',
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          phone: user.phone,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error('Update user error:', error);
+      res.status(500).json({ error: 'Errore nell\'aggiornamento dell\'utente' });
+    }
+  }
+);
+
+// Ban User (admin)
+router.patch('/users/:id/ban', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { banned } = req.body; // Expect boolean
+
+    const newRole = banned ? 'banned' : 'user';
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .update({ role: newRole })
+      .eq('id', id)
+      .select('id, role')
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      message: `Utente ${banned ? 'bannato' : 'sbannato'} con successo`,
+      user
+    });
+  } catch (error: any) {
+    console.error('Ban user error:', error);
+    res.status(500).json({
+      error: 'Errore nel bannare l\'utente',
+      details: error.message || JSON.stringify(error)
+    });
+  }
+});
+
+// Delete User (admin)
+router.delete('/users/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.json({ message: 'Utente eliminato con successo' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ error: 'Errore nell\'eliminazione dell\'utente' });
   }
 });
 

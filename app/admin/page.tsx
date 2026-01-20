@@ -8,6 +8,7 @@ import AdminHeader from "./components/AdminHeader";
 import BookingCalendar from "./components/BookingCalendar";
 import BookingModal from "./components/BookingModal";
 import ServiceModal from "./components/ServiceModal";
+import UserList from "./components/UserList";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -174,8 +175,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("calendar")}
               className={`pb-4 px-4 font-semibold transition ${activeTab === "calendar"
-                  ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
-                  : "text-white/60 hover:text-white/80"
+                ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
+                : "text-white/60 hover:text-white/80"
                 }`}
             >
               📅 Calendario
@@ -183,8 +184,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("bookings")}
               className={`pb-4 px-4 font-semibold transition ${activeTab === "bookings"
-                  ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
-                  : "text-white/60 hover:text-white/80"
+                ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
+                : "text-white/60 hover:text-white/80"
                 }`}
             >
               Lista Prenotazioni
@@ -192,8 +193,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("users")}
               className={`pb-4 px-4 font-semibold transition ${activeTab === "users"
-                  ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
-                  : "text-white/60 hover:text-white/80"
+                ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
+                : "text-white/60 hover:text-white/80"
                 }`}
             >
               Utenti
@@ -201,8 +202,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("services")}
               className={`pb-4 px-4 font-semibold transition ${activeTab === "services"
-                  ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
-                  : "text-white/60 hover:text-white/80"
+                ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
+                : "text-white/60 hover:text-white/80"
                 }`}
             >
               Servizi
@@ -210,8 +211,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab("stats")}
               className={`pb-4 px-4 font-semibold transition ${activeTab === "stats"
-                  ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
-                  : "text-white/60 hover:text-white/80"
+                ? "border-b-2 border-fuchsia-400 text-fuchsia-300"
+                : "text-white/60 hover:text-white/80"
                 }`}
             >
               Statistiche
@@ -287,12 +288,12 @@ export default function AdminPage() {
                                   <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none">
                                     <span
                                       className={`inline-flex h-3 w-3 rounded-full ${booking.status === 'confirmed'
-                                          ? 'bg-green-400 shadow-lg shadow-green-400/50'
-                                          : booking.status === 'completed'
-                                            ? 'bg-blue-400 shadow-lg shadow-blue-400/50'
-                                            : booking.status === 'cancelled'
-                                              ? 'bg-red-400 shadow-lg shadow-red-400/50'
-                                              : 'bg-yellow-400 shadow-lg shadow-yellow-400/50'
+                                        ? 'bg-green-400 shadow-lg shadow-green-400/50'
+                                        : booking.status === 'completed'
+                                          ? 'bg-blue-400 shadow-lg shadow-blue-400/50'
+                                          : booking.status === 'cancelled'
+                                            ? 'bg-red-400 shadow-lg shadow-red-400/50'
+                                            : 'bg-yellow-400 shadow-lg shadow-yellow-400/50'
                                         }`}
                                     />
                                   </div>
@@ -311,36 +312,7 @@ export default function AdminPage() {
                   )}
                 </div>
               ) : activeTab === "users" ? (
-                <div className="space-y-4">
-                  {users.length === 0 ? (
-                    <div className="text-center text-white/70">Nessun utente</div>
-                  ) : (
-                    users.map((u) => (
-                      <div
-                        key={u.id}
-                        className="rounded-2xl border border-white/10 bg-white/5 p-6"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-xl font-bold text-white">
-                              {u.firstName} {u.lastName}
-                            </h3>
-                            <p className="text-sm text-white/60">{u.email}</p>
-                            {u.phone && <p className="text-sm text-white/60">📞 {u.phone}</p>}
-                          </div>
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${u.role === "admin"
-                                ? "bg-fuchsia-500/20 text-fuchsia-300"
-                                : "bg-white/10 text-white/70"
-                              }`}
-                          >
-                            {u.role}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
+                <UserList users={users} onUserDetailsChange={loadUsers} />
               ) : activeTab === "services" ? (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
@@ -383,8 +355,8 @@ export default function AdminPage() {
                             <div className="flex items-center gap-2">
                               <span
                                 className={`rounded-full px-3 py-1 text-xs font-semibold ${service.isVisible
-                                    ? "bg-green-500/20 text-green-300"
-                                    : "bg-gray-500/20 text-gray-300"
+                                  ? "bg-green-500/20 text-green-300"
+                                  : "bg-gray-500/20 text-gray-300"
                                   }`}
                               >
                                 {service.isVisible ? "Visibile" : "Nascosto"}
@@ -485,4 +457,3 @@ export default function AdminPage() {
     </>
   );
 }
-

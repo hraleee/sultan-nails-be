@@ -8,7 +8,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'banned';
   createdAt?: string;
 }
 
@@ -196,6 +196,8 @@ export const bookingsApi = {
 
 // API Admin
 export const adminApi = {
+  // ... existing methods ...
+
   createBooking: async (booking: {
     userId: number;
     serviceName: string;
@@ -239,6 +241,26 @@ export const adminApi = {
 
   getAllUsers: async (): Promise<{ users: User[] }> => {
     return apiRequest<{ users: User[] }>('/admin/users');
+  },
+
+  updateUser: async (id: number, data: { firstName: string; lastName: string; phone?: string }): Promise<{ message: string; user: User }> => {
+    return apiRequest<{ message: string; user: User }>(`/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  banUser: async (id: number, banned: boolean): Promise<{ message: string; user: User }> => {
+    return apiRequest<{ message: string; user: User }>(`/admin/users/${id}/ban`, {
+      method: 'PATCH',
+      body: JSON.stringify({ banned }),
+    });
+  },
+
+  deleteUser: async (id: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/users/${id}`, {
+      method: 'DELETE',
+    });
   },
 
   getStats: async (): Promise<{

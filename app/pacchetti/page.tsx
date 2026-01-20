@@ -148,13 +148,13 @@ export default function PacchettiPage() {
         <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-20 pt-8 sm:px-10 lg:px-14">
           {/* Hero Section */}
           <section className="flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.2em] text-fuchsia-100 w-fit">
+            <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/20 bg-purple-500/5 px-4 py-2 text-xs font-light uppercase tracking-[0.2em] text-purple-100 w-fit">
               Pacchetti & Abbonamenti
             </div>
-            <h1 className="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-              Scegli il pacchetto perfetto per te
+            <h1 className="text-4xl font-light tracking-wide leading-tight sm:text-5xl lg:text-6xl text-white">
+              Scegli il pacchetto <span className="text-purple-200 font-thin">perfetto per te</span>
             </h1>
-            <p className="max-w-3xl text-lg text-white/80 sm:text-xl">
+            <p className="max-w-3xl text-lg text-white/70 font-light sm:text-xl leading-relaxed">
               Dai trattamenti express alle esperienze luxury complete. Ogni
               pacchetto è studiato per offrirti il massimo valore e qualità.
             </p>
@@ -166,50 +166,50 @@ export default function PacchettiPage() {
               {packages.map((pkg) => (
                 <article
                   key={pkg.name}
-                  className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 shadow-lg transition hover:-translate-y-1 hover:border-fuchsia-400/40 hover:bg-white/8 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-3xl border border-purple-200/10 bg-purple-500/5 p-6 sm:p-8 shadow-lg transition hover:-translate-y-1 hover:border-purple-200/30 hover:bg-purple-500/10 hover:shadow-2xl"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-fuchsia-500/10 opacity-0 transition group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-purple-500/10 opacity-0 transition group-hover:opacity-100" />
 
                   <div className="relative space-y-4">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 rounded-full bg-fuchsia-500/20 px-3 py-1 text-xs font-semibold text-fuchsia-100">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 border border-purple-200/20 px-3 py-1 text-xs font-medium text-purple-100">
                       {pkg.badge}
                     </div>
 
                     {/* Header */}
                     <div>
-                      <h2 className="text-2xl sm:text-3xl font-semibold mb-1">
+                      <h2 className="text-2xl sm:text-3xl font-light tracking-wide text-white mb-1">
                         {pkg.name}
                       </h2>
-                      <p className="text-fuchsia-200 text-sm font-medium">
+                      <p className="text-purple-200/80 text-sm font-medium tracking-wide">
                         {pkg.tagline}
                       </p>
                     </div>
 
                     {/* Price & Duration */}
-                    <div className="flex items-center gap-4 pb-4 border-b border-white/10">
+                    <div className="flex items-center gap-4 pb-4 border-b border-purple-200/10">
                       <div>
-                        <div className="text-3xl font-bold text-white">
+                        <div className="text-3xl font-light text-white">
                           {pkg.price}
                         </div>
-                        <div className="text-sm text-white/60">
+                        <div className="text-sm text-white/50 font-light">
                           {pkg.duration}
                         </div>
                       </div>
                     </div>
 
                     {/* Description */}
-                    <p className="text-white/75">{pkg.description}</p>
+                    <p className="text-white/70 font-light leading-relaxed">{pkg.description}</p>
 
                     {/* Includes */}
                     <div className="space-y-2">
-                      <div className="text-sm font-semibold text-white/90">
+                      <div className="text-sm font-medium text-white/80">
                         Include:
                       </div>
-                      <ul className="space-y-2 text-sm text-white/70">
+                      <ul className="space-y-2 text-sm text-white/60 font-light">
                         {pkg.includes.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <span className="text-fuchsia-400 mt-0.5">✓</span>
+                            <span className="text-purple-300 mt-0.5">✓</span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -217,19 +217,19 @@ export default function PacchettiPage() {
                     </div>
 
                     {/* Ideal For */}
-                    <div className="pt-4 border-t border-white/10">
-                      <div className="text-xs uppercase tracking-wider text-white/60 mb-1">
+                    <div className="pt-4 border-t border-purple-200/10">
+                      <div className="text-xs uppercase tracking-wider text-white/40 mb-1 font-medium">
                         Ideale per
                       </div>
-                      <div className="text-sm text-white/80">{pkg.ideal}</div>
+                      <div className="text-sm text-white/80 font-light">{pkg.ideal}</div>
                     </div>
 
                     {/* CTA Button */}
                     <a
-                      href="https://wa.me/393401234567"
+                      href="https://wa.me/393391862999"
                       target="_blank"
                       rel="noreferrer"
-                      className="block w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-rose-500 px-6 py-4 text-center text-base font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:-translate-y-0.5 hover:shadow-fuchsia-500/50"
+                      className="block w-full rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-4 text-center text-base font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-0.5 hover:shadow-purple-500/50"
                     >
                       Prenota {pkg.name}
                     </a>
@@ -242,10 +242,10 @@ export default function PacchettiPage() {
           {/* Subscriptions */}
           <section className="space-y-6">
             <div>
-              <h2 className="text-3xl font-semibold mb-2">
+              <h2 className="text-3xl font-light tracking-wide mb-2 text-white">
                 Abbonamenti mensili
               </h2>
-              <p className="text-white/70">
+              <p className="text-white/60 font-light">
                 Risparmia con i nostri abbonamenti e mantieni le tue unghie
                 sempre perfette
               </p>
@@ -254,28 +254,28 @@ export default function PacchettiPage() {
               {subscriptions.map((sub) => (
                 <div
                   key={sub.title}
-                  className="rounded-3xl border border-white/10 bg-gradient-to-br from-fuchsia-500/10 via-white/5 to-sky-400/10 p-8 space-y-4"
+                  className="rounded-3xl border border-purple-200/10 bg-gradient-to-br from-purple-500/10 via-purple-900/5 to-sky-400/5 p-8 space-y-4 shadow-lg backdrop-blur-sm"
                 >
-                  <div className="inline-flex items-center gap-2 rounded-full bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-100">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs font-medium text-green-200">
                     {sub.savings}
                   </div>
-                  <h3 className="text-2xl font-semibold">{sub.title}</h3>
-                  <div className="text-3xl font-bold text-fuchsia-100">
+                  <h3 className="text-2xl font-light tracking-wide text-white">{sub.title}</h3>
+                  <div className="text-3xl font-light text-purple-100">
                     {sub.price}
                   </div>
-                  <ul className="space-y-2 text-white/80">
+                  <ul className="space-y-2 text-white/70 font-light">
                     {sub.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-fuchsia-400 mt-0.5">✓</span>
+                        <span className="text-purple-300 mt-0.5">✓</span>
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
                   <a
-                    href="https://wa.me/393401234567"
+                    href="https://wa.me/393391862999"
                     target="_blank"
                     rel="noreferrer"
-                    className="block w-full rounded-full border-2 border-fuchsia-400 bg-fuchsia-400/10 px-6 py-3 text-center font-semibold text-white transition hover:bg-fuchsia-400/20"
+                    className="block w-full rounded-full border border-purple-200/30 bg-purple-500/10 px-6 py-3 text-center font-medium text-white transition hover:bg-purple-500/20 hover:border-purple-200/50"
                   >
                     Richiedi info
                   </a>
@@ -285,15 +285,15 @@ export default function PacchettiPage() {
           </section>
 
           {/* Gift Cards */}
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-fuchsia-500/15 via-white/5 to-sky-400/20 p-8">
+          <section className="rounded-3xl border border-purple-200/10 bg-gradient-to-r from-purple-500/15 via-purple-900/20 to-sky-400/20 p-8 shadow-inner">
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl">🎁</span>
-                <h3 className="text-2xl sm:text-3xl font-semibold">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl grayscale brightness-125">🎁</span>
+                <h3 className="text-2xl sm:text-3xl font-light tracking-wide text-white">
                   Gift Card
                 </h3>
               </div>
-              <p className="text-white/80 max-w-2xl">
+              <p className="text-white/70 font-light max-w-2xl">
                 Regala un'esperienza di bellezza! Le nostre gift card sono
                 disponibili per qualsiasi importo e possono essere utilizzate
                 per tutti i servizi.
@@ -302,20 +302,20 @@ export default function PacchettiPage() {
                 {["50€", "100€", "150€"].map((amount) => (
                   <div
                     key={amount}
-                    className="rounded-2xl border border-white/10 bg-white/10 p-4 text-center"
+                    className="rounded-2xl border border-purple-200/10 bg-purple-500/10 p-4 text-center transition hover:bg-purple-500/20"
                   >
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-2xl font-light text-white">
                       {amount}
                     </div>
-                    <div className="text-sm text-white/70">Gift Card</div>
+                    <div className="text-sm text-white/50 font-light">Gift Card</div>
                   </div>
                 ))}
               </div>
               <a
-                href="https://wa.me/393401234567"
+                href="https://wa.me/393391862999"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-block rounded-full bg-white/10 border-2 border-white/30 px-6 py-3 font-semibold text-white transition hover:bg-white/20 hover:border-white"
+                className="inline-block rounded-full bg-purple-500/10 border border-purple-200/30 px-6 py-3 font-medium text-white transition hover:bg-purple-500/20 hover:border-purple-200/50"
               >
                 Acquista Gift Card
               </a>
@@ -323,8 +323,8 @@ export default function PacchettiPage() {
           </section>
 
           {/* FAQ Quick */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-8 space-y-6">
-            <h3 className="text-2xl font-semibold">Domande frequenti</h3>
+          <section className="rounded-3xl border border-purple-200/10 bg-purple-900/5 p-8 space-y-6">
+            <h3 className="text-2xl font-light tracking-wide text-white">Domande frequenti</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 {
@@ -346,34 +346,34 @@ export default function PacchettiPage() {
               ].map((faq, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                  className="rounded-2xl border border-purple-200/10 bg-purple-500/5 p-5 transition hover:bg-purple-500/10"
                 >
-                  <div className="font-semibold text-white mb-2">{faq.q}</div>
-                  <div className="text-sm text-white/70">{faq.a}</div>
+                  <div className="font-medium text-purple-100 mb-2">{faq.q}</div>
+                  <div className="text-sm text-white/60 font-light">{faq.a}</div>
                 </div>
               ))}
             </div>
           </section>
 
           {/* CTA Final */}
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-fuchsia-500/15 via-white/5 to-sky-400/20 p-8 text-center">
-            <h3 className="text-3xl font-semibold mb-4">Pronta a prenotare?</h3>
-            <p className="text-white/80 mb-6 max-w-2xl mx-auto">
+          <section className="rounded-3xl border border-purple-200/10 bg-gradient-to-r from-purple-500/15 via-purple-900/20 to-sky-400/20 p-8 text-center shadow-[0_20px_80px_-40px_rgba(0,0,0,0.4)] backdrop-blur-md">
+            <h3 className="text-3xl font-light tracking-wide mb-4 text-white">Pronta a prenotare?</h3>
+            <p className="text-white/70 font-light mb-6 max-w-2xl mx-auto leading-relaxed">
               Contattaci per prenotare il tuo pacchetto preferito o per avere
               più informazioni. Il nostro team è a tua disposizione!
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a
-                href="https://wa.me/393401234567"
+                href="https://wa.me/393391862999"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-fuchsia-500/40 transition hover:-translate-y-1 hover:shadow-fuchsia-500/60"
+                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-1 hover:shadow-purple-500/50"
               >
                 Prenota su WhatsApp
               </a>
               <a
                 href="/contatti"
-                className="rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/20"
+                className="rounded-full border border-purple-200/30 bg-purple-500/10 px-8 py-4 text-base font-medium text-white transition hover:border-purple-200/50 hover:bg-purple-500/20"
               >
                 Tutti i contatti
               </a>
