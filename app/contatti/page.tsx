@@ -157,7 +157,7 @@ export default function ContattiPage() {
               <div>
                 <h2 className="text-3xl font-light tracking-wide mb-2 text-white">Orari</h2>
                 <p className="text-white/60 font-light">
-                  Siamo aperti dal martedì al sabato
+                  Siamo aperti dal lunedì al venerdì
                 </p>
               </div>
               <div className="space-y-3">

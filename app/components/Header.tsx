@@ -129,9 +129,14 @@ export default function Header() {
                 <div className="p-8 pb-6 border-b border-white/10">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="relative">
-                        <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-fuchsia-400/30 to-sky-400/30 border-4 border-white/20 shadow-2xl" />
-                        <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-2xl bg-gradient-to-r from-fuchsia-400 to-rose-400 shadow-xl animate-pulse" />
+
+                      <div className="relative shrink-0">
+                        {/* Usa img vanilla, no Next/Image */}
+                        <img
+                          src="/sultannailslogo.jpg"
+                          alt="Sultan Nails Logo"
+                          className="h-20 w-20 rounded-2xl border-4 border-white/20 shadow-2xl object-cover"
+                        /> <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-2xl bg-gradient-to-r from-fuchsia-400 to-rose-400 shadow-xl animate-pulse" />
                       </div>
                       <div>
                         <div className="text-sm uppercase tracking-[0.3em] text-fuchsia-200 mb-1">

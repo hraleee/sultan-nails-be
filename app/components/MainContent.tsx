@@ -2,52 +2,38 @@ import Link from "next/link";
 import BookingButton from "./BookingButton";
 export default function MainContent() {
   return (
-    <main className="relative isolate overflow-hidden text-white pt-24">
+    <main className="relative isolate text-white min-h-screen -mt-24">  {/* min-h invece di h-screen */}
+      {/* Gradienti e overlay su tutto il main */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,232,255,0.15),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(171,226,255,0.12),transparent_40%)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-[#0f1018]/80 to-[#080810]" />
 
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-20 pt-8 sm:px-10 lg:px-14">
-        {/* Hero Section */}
-        <section className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/20 bg-purple-500/5 px-4 py-2 text-xs font-light uppercase tracking-[0.2em] text-purple-100">
-              Sultan Nails Studio
+      {/* Hero Section */}
+      <section className="h-screen flex flex-col items-center justify-center gap-6 px-6 sm:flex-row sm:items-center sm:justify-between relative">  {/* h-screen solo qui */}
+        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover z-0">
+          <source src="/sultannailsvideohome.mp4" type="video/mp4" />
+        </video>
+        <div className="relative z-10 text-center sm:text-left max-w-4xl">
+          <div className="relative z-20 flex flex-col items-center gap-8 sm:gap-12 text-center max-w-3xl mx-auto drop-shadow-2xl px-4">
+            {/* Badge solo mobile/tablet */}
+            <div className="flex lg:hidden justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border-2 border-purple-400/60 bg-purple-400/30 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-purple-50 drop-shadow-xl">
+                Sultan Nails
+              </div>
             </div>
-            <h1 className="mt-4 text-4xl font-light tracking-wide leading-tight sm:text-5xl lg:text-6xl text-white">
-              Unghie couture, <span className="font-thin text-purple-200">rituali spa</span> e design su misura
-            </h1>
-            <p className="mt-4 max-w-2xl text-base font-light text-white/70 sm:text-lg tracking-wide">
-              Esperienza privata con luce soffusa, pigmenti premium e protocolli
-              skincare. Ogni appuntamento è ritagliato sul tuo
-              stile.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <BookingButton />
 
-              <a
-                className="rounded-full border border-purple-200/20 bg-purple-500/5 px-8 py-3 text-base font-light text-purple-100 transition hover:border-purple-200/40 hover:bg-purple-500/10"
-                href="/servizi"
-              >
-                Scopri i servizi
-              </a>
-            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+              Unghie couture, <span className="bg-gradient-to-r from-purple-300 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">rituali spa</span> e design su misura
+            </h1>
           </div>
-          <div className="flex flex-col gap-3 self-start rounded-2xl border border-purple-200/10 bg-purple-900/5 px-6 py-5 text-sm text-white/70 shadow-2xl backdrop-blur-sm">
-            <span className="text-xs font-light uppercase tracking-[0.2em] text-purple-200">
-              Contatti rapidi
-            </span>
-            <a
-              className="text-sm font-light text-white hover:text-purple-200 transition"
-              href="tel:+393391862999"
-            >
-              +39 339 186 2999
-            </a>
-            <span className="text-xs font-light text-white/50">
-              Via Corso Umberto I 52, Casalnuovo
-            </span>
-            <span className="text-xs font-light text-white/50">Mar-Sab 10-19</span>
-          </div>
-        </section>
+
+        </div>
+      </section>
+
+      {/* Contenuti successivi VISIBILI */}
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-20 pt-8 sm:px-10 lg:px-14 z-10">
+        {/* Hero Section */}
+
+
 
         {/* About Section */}
         <section className="grid gap-6 rounded-3xl border border-purple-200/10 bg-purple-900/5 p-8 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.4)] backdrop-blur-md lg:grid-cols-[2fr_1.1fr] lg:items-center">
