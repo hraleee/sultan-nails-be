@@ -27,6 +27,7 @@ export default function BookingModal({
   const [formData, setFormData] = useState({
     serviceId: "",
     bookingDate: "",
+    durationMinutes: 60,
     notes: "",
     status: "pending",
     userId: "",
@@ -60,6 +61,7 @@ export default function BookingModal({
       setFormData({
         serviceId: booking.service_id?.toString() || "",
         bookingDate: format(bookingDate, "yyyy-MM-dd'T'HH:mm"),
+        durationMinutes: booking.duration_minutes || 60,
         notes: booking.notes || "",
         status: booking.status || "pending",
         userId: booking.user_id?.toString() || "",
@@ -71,6 +73,7 @@ export default function BookingModal({
       setFormData({
         serviceId: "",
         bookingDate: format(initialDate, "yyyy-MM-dd'T'HH:mm"),
+        durationMinutes: 60,
         notes: "",
         status: "pending",
         userId: "",
@@ -81,6 +84,16 @@ export default function BookingModal({
     }
   }, [booking, initialDate]);
 
+  // Update duration when service changes (only if creating new)
+  useEffect(() => {
+    if (!booking && formData.serviceId) {
+      const selected = availableServices.find(s => s.id === parseInt(formData.serviceId));
+      if (selected) {
+        setFormData(prev => ({ ...prev, durationMinutes: selected.durationMinutes }));
+      }
+    }
+  }, [formData.serviceId, availableServices, booking]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -88,8 +101,17 @@ export default function BookingModal({
 
     try {
       if (booking) {
-        // Update existing booking status
-        await adminApi.updateBookingStatus(booking.id, formData.status as any);
+        // Update existing booking (Full update)
+        const selectedService = availableServices.find(s => s.id === parseInt(formData.serviceId));
+
+        await adminApi.updateBooking(booking.id, {
+          status: formData.status as any,
+          bookingDate: formData.bookingDate,
+          notes: formData.notes,
+          serviceName: selectedService ? selectedService.name : undefined,
+          servicePrice: selectedService ? selectedService.price : undefined,
+          durationMinutes: selectedService ? selectedService.durationMinutes : undefined,
+        });
       } else {
         // Create new booking - need userId and serviceId
         if (!formData.userId) {
@@ -150,60 +172,32 @@ export default function BookingModal({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            {!booking && (
-              <div>
-                <label className="mb-2 block text-sm font-medium text-white/90">
-                  Servizio *
-                </label>
-                <select
-                  value={formData.serviceId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, serviceId: e.target.value })
-                  }
-                  required
-                  className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M8 11L3 6h10z'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 1rem center',
-                    backgroundSize: '16px',
-                  }}
-                >
-                  <option value="" className="bg-[#0f1018]">Seleziona un servizio</option>
-                  {availableServices.map((service) => (
-                    <option key={service.id} value={service.id} className="bg-[#0f1018]">
-                      {service.name} - €{service.price.toFixed(2)} ({service.durationMinutes} min)
-                    </option>
-                  ))}
-                </select>
-                {formData.serviceId && (() => {
-                  const selected = availableServices.find(s => s.id === parseInt(formData.serviceId));
-                  return selected ? (
-                    <div className="mt-2 rounded-lg border border-white/10 bg-white/5 p-3">
-                      <p className="text-sm font-semibold text-white">{selected.name}</p>
-                      {selected.description && (
-                        <p className="mt-1 text-xs text-white/70">{selected.description}</p>
-                      )}
-                      <p className="mt-1 text-xs text-fuchsia-300">
-                        €{selected.price.toFixed(2)} • {selected.durationMinutes} minuti
-                      </p>
-                    </div>
-                  ) : null;
-                })()}
-              </div>
-            )}
-
-            {booking && (
-              <div>
-                <label className="mb-2 block text-sm font-medium text-white/90">
-                  Servizio
-                </label>
-                <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
-                  {booking.service_name}
-                  {booking.service_price && ` - €${booking.service_price}`}
-                </div>
-              </div>
-            )}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/90">
+                Servizio *
+              </label>
+              <select
+                value={formData.serviceId}
+                onChange={(e) =>
+                  setFormData({ ...formData, serviceId: e.target.value })
+                }
+                required
+                className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M8 11L3 6h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 1rem center',
+                  backgroundSize: '16px',
+                }}
+              >
+                <option value="" className="bg-[#0f1018]">Seleziona un servizio</option>
+                {availableServices.map((service) => (
+                  <option key={service.id} value={service.id} className="bg-[#0f1018]">
+                    {service.name} - €{service.price.toFixed(2)} ({service.durationMinutes} min)
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white/90">
@@ -212,12 +206,58 @@ export default function BookingModal({
               <input
                 type="datetime-local"
                 value={formData.bookingDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, bookingDate: e.target.value })
-                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({ ...formData, bookingDate: val });
+
+                  // Immediate Validation
+                  if (val) {
+                    const d = new Date(val);
+                    const day = d.getDay();
+                    const h = d.getHours();
+                    const m = d.getMinutes();
+
+                    if (day === 0 || day === 6) {
+                      setError("Attenzione: Il centro è chiuso nel weekend! (Lun-Ven)");
+                    } else if (h < 9 || h >= 19 || (h === 19 && m > 0)) {
+                      // Note: h >= 19 covers 19:00 if strictly closing AT 19:00, 
+                      // but usually 19:00 is the limit for ENDING? 
+                      // Use logic: Start time must be < 19:00? 
+                      // If it opens 9-19, usually last booking is 18:00 or 18:30.
+                      // If I pick 19:00 start, it's invalid.
+                      // If I pick 18:30 start for 30m, it ends 19:00 (Valid).
+                      // If I pick 18:31, it ends 19:01 (Invalid).
+                      // Let's warn if start is >= 19:00 for sure.
+                      if (h >= 19) {
+                        setError("Attenzione: Selezionato orario dopo la chiusura (19:00)");
+                      } else if (h < 9) {
+                        setError("Attenzione: Selezionato orario prima dell'apertura (09:00)");
+                      } else {
+                        setError(""); // Clear if valid, assuming submit checks duration end
+                      }
+                    } else {
+                      setError("");
+                    }
+                  }
+                }}
                 required
-                disabled={!!booking}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20 disabled:opacity-50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/90">
+                Durata (minuti)
+              </label>
+              <input
+                type="number"
+                min="15"
+                step="15"
+                value={formData.durationMinutes}
+                onChange={(e) =>
+                  setFormData({ ...formData, durationMinutes: parseInt(e.target.value) || 0 })
+                }
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
               />
             </div>
 

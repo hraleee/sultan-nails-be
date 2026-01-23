@@ -115,6 +115,13 @@ export const authApi = {
     return response;
   },
 
+  resendVerificationEmail: async (email: string): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>('/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
   logout: (): void => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
@@ -237,6 +244,13 @@ export const adminApi = {
         body: JSON.stringify({ status }),
       }
     );
+  },
+
+  updateBooking: async (id: number, updates: Partial<Booking & { serviceName: string; servicePrice: number; durationMinutes: number }>): Promise<{ message: string; booking: Booking }> => {
+    return apiRequest<{ message: string; booking: Booking }>(`/admin/bookings/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    });
   },
 
   getAllUsers: async (): Promise<{ users: User[] }> => {

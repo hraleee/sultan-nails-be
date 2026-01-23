@@ -6,6 +6,8 @@ import { emailService } from '../services/email';
 
 const router = express.Router();
 
+
+
 // Tutte le route richiedono autenticazione
 router.use(authenticate);
 
@@ -91,6 +93,42 @@ router.post(
       if (bookingDateTime < new Date()) {
         return res.status(400).json({ error: 'Non puoi prenotare una data nel passato' });
       }
+
+      // Check Business Hours & Days
+      const dayOfWeek = bookingDateTime.getDay(); // 0 = Sunday, 6 = Saturday
+      const hour = bookingDateTime.getHours();
+      const minutes = bookingDateTime.getMinutes();
+
+      // 1. Block Weekends
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return res.status(400).json({ error: 'Siamo chiusi nel weekend. Gli orari sono Lun-Ven 09:00 - 19:00.' });
+      }
+
+      // 2. Check Time Window (09:00 - 19:00)
+      // Start time must be >= 09:00
+      if (hour < 9) {
+        return res.status(400).json({ error: 'Orario non valido. Apriamo alle 09:00.' });
+      }
+
+      // End time must be <= 19:00
+      const duration = durationMinutes || 60;
+      const endDateTime = new Date(bookingDateTime.getTime() + duration * 60000);
+      const endHour = endDateTime.getHours();
+      const endMinutes = endDateTime.getMinutes();
+
+
+      // If end time is past 19:00 (e.g. 19:01 or 20:00)
+      // Strict check: if (endHour > 19 || (endHour === 19 && endMinutes > 0))
+      if (endHour > 19 || (endHour === 19 && endMinutes > 0)) {
+        return res.status(400).json({ error: 'Orario non valido. Chiudiamo alle 19:00.' });
+      }
+
+      if (hour === 13 || (hour === 12 && minutes > 59) || (hour === 14 && minutes === 0)) {
+        return res.status(400).json({
+          error: 'Non è possibile prenotare tra le 13:00 e le 14:00.'
+        });
+      }
+
 
       // Try to find service by name to get service_id
       let serviceId = null;
@@ -338,6 +376,29 @@ router.patch('/:id',
         const newDate = new Date(bookingDate);
         if (newDate < new Date()) {
           return res.status(400).json({ error: 'Non puoi spostare la prenotazione nel passato' });
+        }
+
+        // Check Business Hours & Days
+        const dayOfWeek = newDate.getDay();
+        const hour = newDate.getHours();
+
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          return res.status(400).json({ error: 'Siamo chiusi nel weekend. Gli orari sono Lun-Ven 09:00 - 19:00.' });
+        }
+
+        if (hour < 9) {
+          return res.status(400).json({ error: 'Orario non valido. Apriamo alle 09:00.' });
+        }
+
+        // Check End Time
+        // Use provided duration OR existing duration
+        const targetDuration = durationMinutes || existing.duration_minutes || 60;
+        const endDateTime = new Date(newDate.getTime() + targetDuration * 60000);
+        const endHour = endDateTime.getHours();
+        const endMinutes = endDateTime.getMinutes();
+
+        if (endHour > 19 || (endHour === 19 && endMinutes > 0)) {
+          return res.status(400).json({ error: 'Orario non valido. Chiudiamo alle 19:00.' });
         }
 
         // Check overlap (excluding this booking)

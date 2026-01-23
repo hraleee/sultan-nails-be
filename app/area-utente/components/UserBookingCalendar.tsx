@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addHours, setHours, setMinutes, isToday, parseISO, addDays, subDays, addWeeks, subWeeks, isWeekend } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addHours, setHours, setMinutes, isToday, parseISO, addDays, subDays, addWeeks, subWeeks, isWeekend, addMinutes } from "date-fns";
 import { it } from "date-fns/locale";
 import { bookingsApi, Booking } from "@/lib/api";
 
@@ -17,7 +17,7 @@ export default function BookingCalendar({
     const [currentDate, setCurrentDate] = useState(new Date());
     const [view, setView] = useState<"month" | "day">("month");
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [busySlots, setBusySlots] = useState<Date[]>([]);
+    const [busySlots, setBusySlots] = useState<{ date: Date; duration: number }[]>([]);
     const [myBookings, setMyBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -27,6 +27,8 @@ export default function BookingCalendar({
     const [editInfoModalOpen, setEditInfoModalOpen] = useState(false);
     const [closedModalOpen, setClosedModalOpen] = useState(false);
     const [bookingToDelete, setBookingToDelete] = useState<number | null>(null);
+    const [pranzoModalOpen, setPranzoModalOpen] = useState(false);
+
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -34,8 +36,16 @@ export default function BookingCalendar({
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-    // Slots dalle 9 alle 19 (es. 10 ore)
-    const timeSlots = Array.from({ length: 11 }, (_, i) => i + 9);
+    // Slots dalle 9 alle 19 (ogni 30 minuti)
+    // 09:00, 09:30, ... 18:30 (Last slot starts at 18:30, ends at 19:00)
+    // 19:00 is closing time, so no slot starts at 19:00 unless we want to allow 0 duration? No.
+    const timeSlots: Date[] = [];
+    const baseDate = new Date();
+    baseDate.setHours(9, 0, 0, 0);
+    // Until 18:30 inclusive
+    for (let i = 0; i < 20; i++) { // 10 hours * 2 = 20 slots
+        timeSlots.push(addMinutes(baseDate, i * 30));
+    }
 
     useEffect(() => {
         loadData();
@@ -53,7 +63,12 @@ export default function BookingCalendar({
                 bookingsApi.getAll()
             ]);
 
-            const slots = paramsRes.slots.map(s => parseISO(s.booking_date));
+            // busySlots needs to store duration now to calculate overlap
+            // We'll store objects or just raw data
+            const slots = paramsRes.slots.map(s => ({
+                date: parseISO(s.booking_date),
+                duration: s.duration_minutes || 60
+            }));
             setBusySlots(slots);
             setMyBookings(myBookingsRes.bookings);
         } catch (error) {
@@ -82,17 +97,28 @@ export default function BookingCalendar({
     };
 
     // Helper: Find if a slot belongs to the current user
-    const getMyBooking = (date: Date) => {
+    const getMyBooking = (slotDate: Date) => {
+        // Check if any of my bookings COVERS this slot
         return myBookings.find(b => {
-            const bookingDate = parseISO(b.bookingDate);
-            return isSameDay(bookingDate, date) && bookingDate.getHours() === date.getHours();
+            const bookingStart = parseISO(b.bookingDate);
+            const duration = b.durationMinutes || 60;
+            const bookingEnd = addMinutes(bookingStart, duration);
+
+            // Slot is occupied if: SlotTime >= BookingStart AND SlotTime < BookingEnd
+            // WE compare timestamps
+            return slotDate.getTime() >= bookingStart.getTime() && slotDate.getTime() < bookingEnd.getTime();
         });
     };
 
-    const isSlotBusy = (date: Date) => {
-        return busySlots.some(slot =>
-            isSameDay(slot, date) && slot.getHours() === date.getHours()
-        );
+    const isSlotBusy = (slotDate: Date) => {
+        // Check if any busy slot COVERS this slot
+        return busySlots.some((booking: any) => {
+            const bookingStart = booking.date;
+            const duration = booking.duration;
+            const bookingEnd = addMinutes(bookingStart, duration);
+
+            return slotDate.getTime() >= bookingStart.getTime() && slotDate.getTime() < bookingEnd.getTime();
+        });
     };
 
     const handleDateClick = (date: Date) => {
@@ -148,36 +174,45 @@ export default function BookingCalendar({
         const isClosed = isWeekend(date);
 
         if (myBooking) {
+            // Only show details on the START slot to avoid repetition? 
+            // Or show simplified view. Let's show full for now or condensed.
+            // If it's the exact start time, show title.
+            const bookingStart = parseISO(myBooking.bookingDate);
+            const isStart = isSameDay(bookingStart, date) && bookingStart.getHours() === date.getHours() && bookingStart.getMinutes() === date.getMinutes();
+
             return (
-                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4 relative group">
-                    <div className="text-purple-300 font-medium text-sm mb-1">La tua prenotazione</div>
-                    <div className="text-white/80 text-xs font-light">{myBooking.serviceName}</div>
-                    <div className="absolute right-2 top-2 hidden group-hover:flex gap-2">
-                        {/* Edit Button (Placeholder logic to click slot) */}
-                        <button
-                            onClick={() => {
-                                setEditInfoModalOpen(true);
-                            }}
-                            className="p-1.5 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition text-xs"
-                            title="Modifica"
-                        >
-                            ✏️
-                        </button>
-                        <button
-                            onClick={() => confirmDelete(myBooking.id)}
-                            className="p-1.5 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition text-xs"
-                            title="Elimina"
-                        >
-                            🗑️
-                        </button>
-                    </div>
+                <div className={`rounded-xl border border-purple-500/30 bg-purple-500/10 p-2 relative group h-full flex flex-col justify-center ${!isStart ? 'opacity-80 border-t-0 rounded-t-none' : ''}`}>
+                    {isStart && (
+                        <>
+                            <div className="text-purple-300 font-medium text-sm mb-1 leading-tight">La tua prenotazione</div>
+                            <div className="text-white/80 text-xs font-light truncate">{myBooking.serviceName}</div>
+                            <div className="absolute right-2 top-2 hidden group-hover:flex gap-2 z-10">
+                                <button
+                                    onClick={() => {
+                                        setEditInfoModalOpen(true);
+                                    }}
+                                    className="p-1.5 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition text-xs"
+                                    title="Modifica"
+                                >
+                                    ✏️
+                                </button>
+                                <button
+                                    onClick={() => confirmDelete(myBooking.id)}
+                                    className="p-1.5 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition text-xs"
+                                    title="Elimina"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             );
         }
 
         if (isClosed) {
             return (
-                <div className="rounded-xl bg-red-500/5 border border-red-500/10 p-4 text-red-400/30 text-sm italic cursor-not-allowed font-light">
+                <div className="rounded-xl bg-red-500/5 border border-red-500/10 p-2 text-red-400/30 text-sm italic cursor-not-allowed font-light h-full flex items-center">
                     Chiuso
                 </div>
             );
@@ -185,7 +220,7 @@ export default function BookingCalendar({
 
         if (busy) {
             return (
-                <div className="rounded-xl bg-white/5 border border-white/5 p-4 text-white/30 text-sm italic cursor-not-allowed font-light">
+                <div className="rounded-xl bg-white/5 border border-white/5 p-2 text-white/30 text-sm italic cursor-not-allowed font-light h-full flex items-center">
                     Occupato
                 </div>
             );
@@ -193,7 +228,7 @@ export default function BookingCalendar({
 
         if (isPast) {
             return (
-                <div className="rounded-xl bg-white/5 border border-white/5 p-4 text-white/20 text-sm italic cursor-not-allowed font-light">
+                <div className="rounded-xl bg-white/5 border border-white/5 p-2 text-white/20 text-sm italic cursor-not-allowed font-light h-full flex items-center">
                     Non disponibile
                 </div>
             );
@@ -202,7 +237,7 @@ export default function BookingCalendar({
         return (
             <button
                 onClick={() => onTimeSlotClick(date)}
-                className="w-full rounded-xl border border-purple-500/30 bg-purple-500/10 p-4 text-purple-300 font-medium hover:bg-purple-500/20 transition text-left"
+                className="w-full h-full rounded-xl border border-purple-500/30 bg-purple-500/10 p-2 text-purple-300 font-medium hover:bg-purple-500/20 transition text-left flex items-center"
             >
                 + Prenota
             </button>
@@ -324,12 +359,16 @@ export default function BookingCalendar({
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-6 max-h-[600px] overflow-y-auto overflow-x-auto">
                     {view === "day" ? (
                         <div className="space-y-4">
-                            {timeSlots.map(hour => {
-                                const slotDate = setHours(setMinutes(selectedDate || currentDate, 0), hour);
+                            {timeSlots.map((slotBase, idx) => {
+                                // slotBase is a Date object with correct HOURS and MINUTES (e.g. 09:30)
+                                // We need to apply these hours/minutes to the 'selectedDate'
+                                const slotDate = new Date(selectedDate || currentDate);
+                                slotDate.setHours(slotBase.getHours(), slotBase.getMinutes(), 0, 0);
+
                                 return (
-                                    <div key={hour} className="flex items-center gap-4 border-b border-white/5 pb-4 last:border-0">
+                                    <div key={idx} className="flex items-center gap-4 border-b border-white/5 pb-4 last:border-0 h-24">
                                         <div className="w-16 text-right font-mono text-white/70">{format(slotDate, 'HH:mm')}</div>
-                                        <div className="flex-1">
+                                        <div className="flex-1 h-full">
                                             {renderSlot(slotDate)}
                                         </div>
                                     </div>
@@ -339,7 +378,7 @@ export default function BookingCalendar({
                     ) : (
                         <div className="min-w-[800px]">
                             <div className="grid grid-cols-8 gap-2">
-                                {/* Empty corner cell for alignment if needed, or just remove time column */}
+                                {/* Empty corner cell */}
                                 <div className="pt-12 space-y-2 border-r border-white/10 pr-2 flex flex-col items-center justify-center">
                                     <span className="text-xs text-white/30 rotate-180 text-vertical" style={{ writingMode: 'vertical-rl' }}>ORARI</span>
                                 </div>
@@ -354,10 +393,12 @@ export default function BookingCalendar({
                                             <div className="text-lg">{format(day, 'd')}</div>
                                         </div>
                                         <div className="space-y-2">
-                                            {timeSlots.map(hour => {
-                                                const slotDate = setHours(setMinutes(day, 0), hour);
+                                            {timeSlots.map((slotBase, idx) => {
+                                                const slotDate = new Date(day);
+                                                slotDate.setHours(slotBase.getHours(), slotBase.getMinutes(), 0, 0);
+
                                                 return (
-                                                    <div key={hour} className="h-14">
+                                                    <div key={idx} className="h-10">
                                                         {renderCompactSlot(slotDate)}
                                                     </div>
                                                 )
@@ -412,6 +453,7 @@ export default function BookingCalendar({
                     </div>
                 </div>
             )}
+
 
             {/* Closed Info Modal */}
             {closedModalOpen && (

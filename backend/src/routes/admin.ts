@@ -113,16 +113,72 @@ router.post(
         return res.status(400).json({ error: 'Non puoi creare una prenotazione nel passato' });
       }
 
-      // Check for overlapping bookings
-      const { data: existingBookings } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('booking_date', bookingDate)
-        .in('status', ['pending', 'confirmed'])
-        .limit(1);
+      // Check Business Hours & Days
+      const dayOfWeek = bookingDateTime.getDay();
+      const hour = bookingDateTime.getHours();
 
-      if (existingBookings && existingBookings.length > 0) {
-        return res.status(400).json({ error: 'Data e ora già prenotate' });
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return res.status(400).json({ error: 'Siamo chiusi nel weekend. Gli orari sono Lun-Ven 09:00 - 19:00.' });
+      }
+
+      if (hour < 9) {
+        return res.status(400).json({ error: 'Orario non valido. Apriamo alle 09:00.' });
+      }
+
+      const duration = durationMinutes || 60;
+      const endDateTime = new Date(bookingDateTime.getTime() + duration * 60000);
+      const endHour = endDateTime.getHours();
+      const endMinutes = endDateTime.getMinutes();
+
+      if (endHour > 19 || (endHour === 19 && endMinutes > 0)) {
+        return res.status(400).json({ error: 'Orario non valido. Chiudiamo alle 19:00.' });
+      }
+
+      // 1. Lunch Break Validation
+      // 13:00 - 14:00 (1PM - 2PM) implies: START cannot be >= 13:00 AND < 14:00.
+      // Actually strictly: The INTERVAL [Start, End] cannot overlap with [13:00, 14:00].
+      // Simple rule: Appointment cannot START between 13:00 and 13:59.
+      // AND Appointment cannot END after 13:00 (overlapping lunch).
+
+      const newStart = new Date(bookingDate);
+      const newEnd = new Date(newStart.getTime() + (durationMinutes || 60) * 60000);
+
+      const lunchStart = new Date(bookingDate);
+      lunchStart.setHours(13, 0, 0, 0);
+      const lunchEnd = new Date(bookingDate);
+      lunchEnd.setHours(14, 0, 0, 0);
+
+      // Check overlap with lunch: (StartA < EndB) && (EndA > StartB)
+      if (newStart < lunchEnd && newEnd > lunchStart) {
+        return res.status(400).json({ error: 'Pausa pranzo (13:00 - 14:00). Seleziona un altro orario.' });
+      }
+
+      // 2. Advanced Range Overlap Validation
+      // Fetch bookings for the day to check range overlap in memory
+      const dayStart = new Date(bookingDate);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(bookingDate);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const { data: dayBookings } = await supabase
+        .from('bookings')
+        .select('booking_date, duration_minutes')
+        .in('status', ['pending', 'confirmed'])
+        .gte('booking_date', dayStart.toISOString())
+        .lte('booking_date', dayEnd.toISOString());
+
+      if (dayBookings) {
+        const hasOverlap = dayBookings.some(b => {
+          const existingStart = new Date(b.booking_date);
+          const existingEnd = new Date(existingStart.getTime() + (b.duration_minutes || 60) * 60000);
+
+          // Overlap logic: (StartA < EndB) && (EndA > StartB)
+          return newStart < existingEnd && newEnd > existingStart;
+        });
+
+        if (hasOverlap) {
+          return res.status(400).json({ error: 'Orario non disponibile (sovrapposizione con altro appuntamento)' });
+        }
       }
 
       // Try to find service by name to get service_id
@@ -229,9 +285,169 @@ router.patch(
       res.status(500).json({ error: 'Errore nell\'aggiornamento della prenotazione' });
     }
   }
+
 );
 
-// Ottieni tutti gli utenti (admin)
+// Aggiorna prenotazione completa (admin)
+router.patch(
+  '/bookings/:id',
+  [
+    body('bookingDate').optional().isISO8601(),
+    body('servicePrice').optional().isFloat({ min: 0 }),
+    body('durationMinutes').optional().isInt({ min: 1 }),
+  ],
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { id } = req.params;
+      const { serviceName, servicePrice, bookingDate, durationMinutes, notes, status } = req.body;
+
+      // 1. Fetch existing booking AND user details first
+      const { data: existingBooking, error: fetchError } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          users (email)
+        `)
+        .eq('id', id)
+        .single();
+
+      if (fetchError || !existingBooking) {
+        return res.status(404).json({ error: 'Prenotazione non trovata' });
+      }
+
+      // 2. Validate Date/Duration Changes
+      if (bookingDate || durationMinutes) {
+        const targetDate = bookingDate ? new Date(bookingDate) : new Date(existingBooking.booking_date);
+        const targetDuration = durationMinutes || existingBooking.duration_minutes || 60;
+
+        const newStart = new Date(targetDate);
+        const newEnd = new Date(newStart.getTime() + targetDuration * 60000);
+
+        // Check Business Hours & Days
+        const dayOfWeek = newStart.getDay();
+        const hour = newStart.getHours();
+
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          return res.status(400).json({ error: 'Siamo chiusi nel weekend. Gli orari sono Lun-Ven 09:00 - 19:00.' });
+        }
+
+        if (hour < 9) {
+          return res.status(400).json({ error: 'Orario non valido. Apriamo alle 09:00.' });
+        }
+
+        const endHour = newEnd.getHours();
+        const endMinutes = newEnd.getMinutes();
+
+        if (endHour > 19 || (endHour === 19 && endMinutes > 0)) {
+          return res.status(400).json({ error: 'Orario non valido. Chiudiamo alle 19:00.' });
+        }
+
+        // A. Lunch Break (13:00 - 14:00)
+        const lunchStart = new Date(targetDate);
+        lunchStart.setHours(13, 0, 0, 0);
+        const lunchEnd = new Date(targetDate);
+        lunchEnd.setHours(14, 0, 0, 0);
+
+        if (newStart < lunchEnd && newEnd > lunchStart) {
+          return res.status(400).json({ error: 'Pausa pranzo (13:00 - 14:00). Seleziona un altro orario.' });
+        }
+
+        // B. Range Overlap 
+        const dayStart = new Date(targetDate);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(targetDate);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const { data: dayBookings } = await supabase
+          .from('bookings')
+          .select('id, booking_date, duration_minutes')
+          .in('status', ['pending', 'confirmed'])
+          .gte('booking_date', dayStart.toISOString())
+          .lte('booking_date', dayEnd.toISOString())
+          .neq('id', id); // Exclude current
+
+        if (dayBookings) {
+          const hasOverlap = dayBookings.some(b => {
+            const existingStart = new Date(b.booking_date);
+            const existingEnd = new Date(existingStart.getTime() + (b.duration_minutes || 60) * 60000);
+            return newStart < existingEnd && newEnd > existingStart;
+          });
+
+          if (hasOverlap) {
+            return res.status(400).json({ error: 'Orario non disponibile (sovrapposizione con altro appuntamento)' });
+          }
+        }
+      }
+
+      // 3. Prepare Updates
+      const updates: any = { updated_at: new Date().toISOString() };
+      if (serviceName) updates.service_name = serviceName;
+      if (servicePrice !== undefined) updates.service_price = servicePrice;
+      if (bookingDate) updates.booking_date = bookingDate;
+      if (durationMinutes) updates.duration_minutes = durationMinutes;
+      if (notes !== undefined) updates.notes = notes;
+      if (status) updates.status = status;
+
+      // 4. Determine Service ID if name changed
+      if (serviceName && serviceName !== existingBooking.service_name) {
+        const { data: service } = await supabase
+          .from('services')
+          .select('id')
+          .eq('name', serviceName)
+          .maybeSingle();
+        if (service) updates.service_id = service.id;
+      }
+
+      // 5. Build Update Object to check for meaningful changes
+      const isDateChanged = bookingDate && new Date(bookingDate).getTime() !== new Date(existingBooking.booking_date).getTime();
+      const isServiceChanged = serviceName && serviceName !== existingBooking.service_name;
+
+      // 6. Perform Update
+      const { data: updatedBooking, error: updateError } = await supabase
+        .from('bookings')
+        .update(updates)
+        .eq('id', id)
+        .select(`
+           id, service_id, service_name, service_price, booking_date, 
+           duration_minutes, status, notes, created_at
+        `)
+        .single();
+
+      if (updateError) throw updateError;
+
+      // 7. Send Notifications if relevant changes occurred
+      // We need user email from the FIRST fetch
+      const user = existingBooking.users as any; // or array check
+      const userEmail = Array.isArray(user) ? user[0]?.email : user?.email;
+
+      if (userEmail && (isDateChanged || isServiceChanged)) {
+        console.log(`📧 Sending update email to ${userEmail} for booking ${id}`);
+        await emailService.sendBookingUpdateEmail(
+          userEmail,
+          existingBooking, // Pass old details
+          { ...updatedBooking, bookingDate: updatedBooking.booking_date, serviceName: updatedBooking.service_name } // Ensure normalized format
+        );
+      } else if (userEmail && status && status !== existingBooking.status) {
+        // Fallback to status update email if only status changed
+        await emailService.sendBookingStatusUpdateEmail(userEmail, updatedBooking, status as any);
+      }
+
+      res.json({
+        message: 'Prenotazione aggiornata con successo',
+        booking: updatedBooking,
+      });
+
+    } catch (error: any) {
+      console.error('Admin update booking error:', error);
+      res.status(500).json({ error: 'Errore nell\'aggiornamento della prenotazione' });
+    }
+  }
+);
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
     const { data, error } = await supabase

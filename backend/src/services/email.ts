@@ -57,12 +57,14 @@ export const emailService = {
         await sendEmail({
             to: email,
             subject: 'Verifica la tua email - Sultan Nails',
-            text: `Clicca qui per verificare la tua email: ${verificationLink}`,
+            text: `Il tuo codice di verifica è: ${otp}\n\nOppure clicca qui: ${verificationLink}`,
             html: `
                 <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
                     <h2 style="color: #d946ef;">Sultan Nails</h2>
                     <p>Grazie per esserti registrato!</p>
-                    <p>Per attivare il tuo account, clicca sul pulsante qui sotto:</p>
+                    <p>Il tuo codice di verifica è:</p>
+                    <h1 style="background: #fff; padding: 10px; display: inline-block; border-radius: 8px; border: 1px solid #ddd; letter-spacing: 5px;">${otp}</h1>
+                    <p>Per attivare il tuo account, puoi anche cliccare sul pulsante qui sotto:</p>
                     <a href="${verificationLink}" style="background-color: #d946ef; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin: 10px 0;">Verifica Email</a>
                     <p style="font-size: 14px; color: #666;">Oppure copia questo link: <br> ${verificationLink}</p>
                 </div>
@@ -285,6 +287,41 @@ export const emailService = {
                         <p><strong>Data:</strong> ${date}</p>
                         <p><strong>Ora:</strong> ${time}</p>
                         <p><strong>Servizio:</strong> ${b.serviceName}</p>
+                    </div>
+                </div>
+            `
+        });
+    },
+
+    // 11. Notifica Utente: Modifica Appuntamento (Admin)
+    sendBookingUpdateEmail: async (email: string, oldBooking: any, newBooking: any) => {
+        const oldB = normalizeBooking(oldBooking);
+        const newB = normalizeBooking(newBooking);
+
+        const oldDate = oldB.bookingDate ? new Date(oldB.bookingDate).toLocaleDateString('it-IT') : 'N/A';
+        const oldTime = oldB.bookingDate ? new Date(oldB.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
+        const newDate = newB.bookingDate ? new Date(newB.bookingDate).toLocaleDateString('it-IT') : 'N/A';
+        const newTime = newB.bookingDate ? new Date(newB.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
+        await sendEmail({
+            to: email,
+            subject: '✏️ Appuntamento Modificato - Sultan Nails',
+            text: `Il tuo appuntamento è stato modificato.\n\nVecchi dettagli: ${oldB.serviceName} il ${oldDate} alle ${oldTime}\nNuovi dettagli: ${newB.serviceName} il ${newDate} alle ${newTime}`,
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
+                    <h2 style="color: #d946ef;">Appuntamento Modificato</h2>
+                    <p>Gentile cliente, il tuo appuntamento è stato modificato dallo staff.</p>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0; color: #666;">Dettagli Aggiornati:</h3>
+                        <p><strong>Servizio:</strong> ${newB.serviceName}</p>
+                        <p><strong>Data:</strong> ${newDate}</p>
+                        <p><strong>Ora:</strong> ${newTime}</p>
+                    </div>
+
+                    <div style="background: #eee; padding: 15px; border-radius: 8px; color: #666; font-size: 14px;">
+                        <p><strong>Precedentemente:</strong> ${oldB.serviceName} il ${oldDate} alle ${oldTime}</p>
                     </div>
                 </div>
             `

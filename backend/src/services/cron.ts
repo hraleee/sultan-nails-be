@@ -7,11 +7,17 @@ export const schedulerService = {
     init: () => {
         console.log('⏳ Scheduler service initialized');
 
-        // Check every day at 08:00 AM
+        // Check every day at 08:00 AM (Reminders)
         cron.schedule('0 8 * * *', async () => {
             console.log('Running daily reminder check...');
             await checkSameDayReminders();
             await checkWeeklyReminders();
+        });
+
+        // Cleanup unverified users every day at 03:00 AM
+        cron.schedule('0 3 * * *', async () => {
+            console.log('Running daily unverified user cleanup...');
+            await checkUnverifiedUsers();
         });
     },
 
@@ -23,6 +29,11 @@ export const schedulerService = {
         await checkSameDayReminders(targetDate);
         // We could also simulate weekly reminders relative to this date if needed
         await checkWeeklyReminders(targetDate);
+
+        // For testing: Cleanup unverified users immediately (0ms retention)
+        console.log('🔄 Manually triggering unverified user cleanup (immediate)...');
+        await checkUnverifiedUsers(0);
+
         return { message: 'Checks executed' };
     }
 };
@@ -99,5 +110,30 @@ const checkWeeklyReminders = async (targetDate: Date = new Date()) => {
         }
     } catch (error) {
         console.error('Error in checkWeeklyReminders:', error);
+    }
+};
+
+// Default retention: 24 hours
+const checkUnverifiedUsers = async (retentionMs: number = 24 * 60 * 60 * 1000) => {
+    try {
+        const cutoffDate = new Date(Date.now() - retentionMs);
+
+        // Delete users who are NOT verified AND created before the cutoff
+        const { count, error } = await supabase
+            .from('users')
+            .delete({ count: 'exact' })
+            .eq('is_verified', false)
+            .lt('created_at', cutoffDate.toISOString());
+
+        if (error) throw error;
+
+        if (count && count > 0) {
+            console.log(`🧹 Cleaned up ${count} unverified users created before ${cutoffDate.toISOString()}`);
+        } else {
+            console.log('🧹 No unverified users to clean up.');
+        }
+
+    } catch (error) {
+        console.error('Error in checkUnverifiedUsers:', error);
     }
 };

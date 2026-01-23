@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authApi } from "@/lib/api";
@@ -19,7 +19,55 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [canResend, setCanResend] = useState(true);
+
+  // Timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await authApi.verifyEmail(formData.email, otp);
+      router.push("/area-utente");
+    } catch (err: any) {
+      console.error("Verification Error:", err);
+      setError(err.message || "Codice non valido");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!canResend) return;
+
+    setLoading(true);
+    try {
+      await authApi.resendVerificationEmail(formData.email);
+      setTimer(61); // 60 seconds countdown
+      setCanResend(false);
+      setError(""); // Clear previous errors
+    } catch (err: any) {
+      console.error("Resend Error:", err);
+      setError(err.message || "Errore nell'invio del codice");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -37,7 +85,7 @@ export default function RegisterPage() {
 
     try {
       console.log("Calling authApi.register...");
-      await authApi.register(
+      const res = await authApi.register(
         formData.email,
         formData.password,
         formData.firstName,
@@ -45,7 +93,13 @@ export default function RegisterPage() {
         formData.phone || undefined
       );
 
-      setIsSuccess(true);
+      // @ts-ignore - verificationNeeded added to backend response
+      if (res.verificationNeeded || res.message) {
+        setIsSuccess(true);
+        setTimer(60); // Start timer immediately on success
+        setCanResend(false);
+      }
+
     } catch (err: any) {
       console.error("Register Error:", err);
       setError(err.message || "Errore durante la registrazione");
@@ -68,18 +122,58 @@ export default function RegisterPage() {
                 📩
               </div>
             </div>
-            <h1 className="mb-4 text-2xl font-bold text-white">Controlla la tua email</h1>
-            <p className="mb-8 text-white/70">
-              Ti abbiamo inviato un link di conferma a <span className="font-semibold text-white">{formData.email}</span>.
-              <br />
-              Clicca sul link per attivare il tuo account.
+            <h1 className="mb-4 text-2xl font-bold text-white">Verifica Email</h1>
+            <p className="mb-6 text-white/70">
+              Abbiamo inviato un codice a <span className="font-semibold text-white">{formData.email}</span>.
+              Inseriscilo qui sotto per attivare il tuo account.
             </p>
-            <Link
-              href="/login"
-              className="inline-block rounded-xl bg-white/10 px-6 py-3 font-semibold text-white hover:bg-white/20"
+
+            {error && (
+              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleVerify} className="space-y-6">
+              <div>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Codice OTP (6 cifre)"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-2xl font-bold tracking-widest text-white placeholder:text-white/20 focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
+                  maxLength={6}
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 font-bold text-white shadow-xl shadow-purple-500/40 transition hover:-translate-y-0.5 hover:shadow-purple-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Verifica..." : "Verifica Account"}
+              </button>
+            </form>
+
+            <div className="mt-6 border-t border-white/10 pt-6">
+              <p className="mb-3 text-sm text-white/60">Non hai ricevuto il codice?</p>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={!canResend || loading}
+                className="text-sm font-semibold text-fuchsia-400 hover:text-fuchsia-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {canResend ? "Invia nuovo codice" : `Invia nuovo codice tra ${timer}s`}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsSuccess(false)}
+              className="mt-4 text-sm text-white/40 hover:text-white/60"
             >
-              Torna al Login
-            </Link>
+              Indietro
+            </button>
           </div>
         </div>
       </main>
@@ -106,7 +200,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleRegisterSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="mb-2 block text-sm font-medium text-white/90">

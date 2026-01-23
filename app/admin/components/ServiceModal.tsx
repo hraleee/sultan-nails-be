@@ -155,17 +155,23 @@ export default function ServiceModal({
               <label className="mb-2 block text-sm font-medium text-white/90">
                 Durata (minuti) *
               </label>
-              <input
-                type="number"
-                min="1"
+              <select
                 value={formData.durationMinutes}
                 onChange={(e) =>
                   setFormData({ ...formData, durationMinutes: e.target.value })
                 }
                 required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
-                placeholder="60"
-              />
+                className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
+              >
+                <option value="30" className="bg-[#0f1018]">30 Minuti</option>
+                <option value="60" className="bg-[#0f1018]">1 Ora</option>
+                <option value="90" className="bg-[#0f1018]">1 Ora e 30 Min</option>
+                <option value="120" className="bg-[#0f1018]">2 Ore</option>
+                <option value="150" className="bg-[#0f1018]">2 Ore e 30 Min</option>
+                <option value="180" className="bg-[#0f1018]">3 Ore</option>
+                <option value="210" className="bg-[#0f1018]">3 Ore e 30 Min</option>
+                <option value="240" className="bg-[#0f1018]">4 Ore</option>
+              </select>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authApi } from "@/lib/api";
@@ -14,13 +14,72 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
 
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [canResend, setCanResend] = useState(true);
+  const [isVerification, setIsVerification] = useState(false);
+
+  // Timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await authApi.verifyEmail(email, otp);
+      router.push("/area-utente");
+    } catch (err: any) {
+      console.error("Verification Error:", err);
+      setError(err.message || "Codice non valido");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!canResend) return;
+
+    setLoading(true);
+    try {
+      await authApi.resendVerificationEmail(email);
+      setTimer(61); // 60 seconds countdown
+      setCanResend(false);
+      setError(""); // Clear previous errors
+    } catch (err: any) {
+      console.error("Resend Error:", err);
+      setError(err.message || "Errore nell'invio del codice");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
+      // @ts-ignore
       const response = await authApi.login(email, password);
+
+      // Check for verification needed
+      // @ts-ignore
+      if (response.verificationNeeded) {
+        setIsVerification(true);
+        setTimer(60);
+        setCanResend(false);
+        return;
+      }
 
       // Redirect based on role
       if (response.user.role === 'admin') {
@@ -34,6 +93,74 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (isVerification) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-[#0f1018] to-black px-6">
+        <div className="mx-auto max-w-md w-full">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl text-center">
+            <div className="mb-6 flex justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-fuchsia-500/20 text-4xl">
+                📩
+              </div>
+            </div>
+            <h1 className="mb-4 text-2xl font-bold text-white">Verifica Email</h1>
+            <p className="mb-6 text-white/70">
+              Abbiamo inviato un codice a <span className="font-semibold text-white">{email}</span>.
+              Inseriscilo qui sotto per accedere.
+            </p>
+
+            {error && (
+              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleVerify} className="space-y-6">
+              <div>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Codice OTP (6 cifre)"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-2xl font-bold tracking-widest text-white placeholder:text-white/20 focus:border-fuchsia-400/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/20"
+                  maxLength={6}
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 font-bold text-white shadow-xl shadow-purple-500/40 transition hover:-translate-y-0.5 hover:shadow-purple-500/60 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Verifica..." : "Verifica Account"}
+              </button>
+            </form>
+
+            <div className="mt-6 border-t border-white/10 pt-6">
+              <p className="mb-3 text-sm text-white/60">Non hai ricevuto il codice?</p>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={!canResend || loading}
+                className="text-sm font-semibold text-fuchsia-400 hover:text-fuchsia-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {canResend ? "Invia nuovo codice" : `Invia nuovo codice tra ${timer}s`}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsVerification(false)}
+              className="mt-4 text-sm text-white/40 hover:text-white/60"
+            >
+              Indietro
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

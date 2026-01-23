@@ -29,12 +29,43 @@ router.post(
       // Check if user already exists
       const { data: existingUser } = await supabase
         .from('users')
-        .select('id')
+        .select('*')
         .eq('email', email)
         .maybeSingle();
 
       if (existingUser) {
-        return res.status(400).json({ error: 'Email già registrata' });
+        if (existingUser.is_verified) {
+          return res.status(400).json({ error: 'Email già registrata' });
+        }
+
+        // If exists but NOT verified, check password
+        const isPasswordMatch = await bcrypt.compare(password, existingUser.password_hash);
+        if (!isPasswordMatch) {
+          return res.status(400).json({ error: 'Email già registrata' });
+        }
+
+        // User exists, not verified, password matches -> Resend OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+        await supabase
+          .from('users')
+          .update({
+            verification_code: otp,
+            verification_expires_at: expiresAt,
+            first_name: firstName, // Update details if changed
+            last_name: lastName,
+            phone: phone || existingUser.phone
+          })
+          .eq('id', existingUser.id);
+
+        await emailService.sendVerificationEmail(email, otp);
+
+        return res.status(200).json({
+          message: 'Utente già registrato ma non verificato. Nuovo codice inviato.',
+          verificationNeeded: true,
+          email: email
+        });
       }
 
       // Hash password
@@ -72,6 +103,8 @@ router.post(
 
       res.status(201).json({
         message: 'Registrazione iniziata. Controlla la tua email per il codice di verifica.',
+        verificationNeeded: true,
+        email: email
       });
     } catch (error) {
       console.error('Registration error:', error);
@@ -134,6 +167,61 @@ router.post('/verify', async (req: Request, res: Response) => {
   }
 });
 
+// Resend Verification Code
+router.post('/resend-verification', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email richiesta' });
+    }
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (error || !user) {
+      // Per sicurezza non riveliamo se l'utente non esiste, ma in questo flusso
+      // specifico ha senso dire "Utente non trovato" se stiamo cercando di rinviare a un account noto?
+      // Manteniamo la sicurezza: se non esiste, diciamo inviato comunque o errore generico?
+      // In questo caso, l'utente sa di essersi registrato, quindi se non lo troviamo è strano.
+      // Direi: se non esiste, error: 'Utente non trovato'. 
+      // Se esiste ma è già verificato: error: 'Utente già verificato'.
+      return res.status(404).json({ error: 'Utente non trovato' });
+    }
+
+    if (user.is_verified) {
+      return res.status(400).json({ error: 'Utente già verificato' });
+    }
+
+    // Generate NEW OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+
+    // Update User
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        verification_code: otp,
+        verification_expires_at: expiresAt
+      })
+      .eq('id', user.id);
+
+    if (updateError) throw updateError;
+
+    // Send Email
+    await emailService.sendVerificationEmail(email, otp);
+
+    res.json({ message: 'Nuovo codice di verifica inviato' });
+
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({ error: 'Errore durante l\'invio del codice' });
+  }
+});
+
 // Login
 router.post(
   '/login',
@@ -169,7 +257,27 @@ router.post(
 
       // Check Verification
       if (user.is_verified === false) {
-        return res.status(403).json({ error: 'Email non verificata. Controlla la tua casella di posta.' });
+        // Generate NEW OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+
+        // Update User
+        await supabase
+          .from('users')
+          .update({
+            verification_code: otp,
+            verification_expires_at: expiresAt
+          })
+          .eq('id', user.id);
+
+        // Send Email
+        await emailService.sendVerificationEmail(email, otp);
+
+        return res.status(200).json({
+          message: 'Email non verificata. Nuovo codice inviato.',
+          verificationNeeded: true,
+          email: email
+        });
       }
 
       // Check if Banned
