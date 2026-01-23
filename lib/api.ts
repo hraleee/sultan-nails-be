@@ -1,6 +1,8 @@
 // Utility per chiamate API al backend
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+const API_URL = '/api/proxy';
 
 export interface User {
   id: number;
