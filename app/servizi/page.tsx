@@ -228,14 +228,12 @@ export default function ServiziPage() {
               consulenza personalizzata. Rispondiamo entro poche ore!
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <a
-                href="https://wa.me/393391862999"
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                href="/login"
                 className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-1 hover:shadow-purple-500/50"
               >
-                Prenota su WhatsApp
-              </a>
+                Prenota Online
+              </Link>
               <a
                 href="tel:+393391862999"
                 className="rounded-full border border-purple-200/30 bg-purple-500/10 px-8 py-4 text-base font-medium text-white transition hover:border-purple-200/50 hover:bg-purple-500/20"

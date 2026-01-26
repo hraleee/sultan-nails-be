@@ -11,7 +11,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: 'user' | 'admin.ts' | 'banned';
+  role: 'user' | 'admin' | 'banned';
   createdAt?: string;
 }
 

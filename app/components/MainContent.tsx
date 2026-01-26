@@ -241,14 +241,12 @@ export default function MainContent() {
           <div className="relative overflow-hidden rounded-3xl border border-purple-200/10 bg-purple-500/10 p-8 shadow-inner grid place-items-center">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(250,232,255,0.15),transparent_50%)]" />
             <div className="relative flex flex-wrap gap-3 justify-center">
-// ...
               <Link
                 href="/login"
-                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:-translate-y-1 transition-all"
+                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-1 hover:shadow-purple-500/50"
               >
-                Prenota Ora
+                Prenota Online
               </Link>
-// ...
 
               <a
                 href="/contatti"
