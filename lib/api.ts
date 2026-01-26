@@ -1,8 +1,9 @@
 // Utility per chiamate API al backend
 
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
-const API_URL = '/api/proxy';
+// URL per la connessione diretta (prioritaria)
+const DIRECT_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sultan-nails-be.pxxl.click/api';
+// URL per la connessione via proxy (fallback)
+const PROXY_API_URL = '/api/proxy';
 
 export interface User {
   id: number;
@@ -10,7 +11,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: 'user' | 'admin' | 'banned';
+  role: 'user' | 'admin.ts' | 'banned';
   createdAt?: string;
 }
 
@@ -54,14 +55,34 @@ const apiRequest = async <T>(
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  let usedProxy = false;
+
+  try {
+    // Tenta prima la connessione diretta
+    response = await fetch(`${DIRECT_API_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (directError) {
+    console.warn(`[API] Direct connection to ${DIRECT_API_URL} failed, falling back to proxy...`, directError);
+    // Se fallisce (es. CORS, Network Error), usa il proxy
+    try {
+      usedProxy = true;
+      response = await fetch(`${PROXY_API_URL}${endpoint}`, {
+        ...options,
+        headers,
+      });
+    } catch (proxyError) {
+      // Se fallisce anche il proxy, lancia l'errore originale (o quello del proxy)
+      console.error('[API] Proxy verification failed too.', proxyError);
+      throw proxyError;
+    }
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Errore sconosciuto' }));
-    throw new Error(error.error || `HTTP error! status: ${response.status}`);
+    throw new Error(error.error || `HTTP error! status: ${response.status} (Proxy: ${usedProxy})`);
   }
 
   return response.json();

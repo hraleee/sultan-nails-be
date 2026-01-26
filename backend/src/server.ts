@@ -46,6 +46,10 @@ app.get('/api/debug/trigger-reminders', async (req, res) => {
   }
 });
 
+import { debugRoutes } from './routes/debug';
+app.get('/api/debug/test-email', debugRoutes);
+
+
 // Test database connection
 supabase.from('users').select('count', { count: 'exact', head: true })
   .then(({ error }: { error: any }) => {

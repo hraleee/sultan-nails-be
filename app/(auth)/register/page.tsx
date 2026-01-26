@@ -127,6 +127,9 @@ export default function RegisterPage() {
               Abbiamo inviato un codice a <span className="font-semibold text-white">{formData.email}</span>.
               Inseriscilo qui sotto per attivare il tuo account.
             </p>
+            <p className="mb-6 text-xs text-white/50 bg-white/5 p-2 rounded-lg border border-white/10">
+              ⚠️ Non hai ricevuto l'email? Controlla la cartella <strong>Spam</strong> o <strong>Posta Indesiderata</strong> o riprova tra 15 minuti.
+            </p>
 
             {error && (
               <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">

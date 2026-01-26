@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configura il transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -20,8 +19,7 @@ const normalizeBooking = (booking: any) => ({
     status: booking.status
 });
 
-// Indirizzo admin (hardcoded o da env)
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@sultannails.it';
 
 interface EmailOptions {
     to: string;
@@ -53,20 +51,19 @@ const sendEmail = async ({ to, subject, text, html }: EmailOptions) => {
 export const emailService = {
     // 1. Verifica Email (OTP)
     sendVerificationEmail: async (email: string, otp: string) => {
-        const verificationLink = `${process.env.FRONTEND_URL}/verify?email=${encodeURIComponent(email)}&code=${otp}`;
+        const link = `${process.env.FRONTEND_URL}/verify?email=${encodeURIComponent(email)}&code=${otp}`;
+
         await sendEmail({
             to: email,
             subject: 'Verifica la tua email - Sultan Nails',
-            text: `Il tuo codice di verifica è: ${otp}\n\nOppure clicca qui: ${verificationLink}`,
+            text: `Il tuo codice di verifica è: ${otp}`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
+                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9; color: #333;">
                     <h2 style="color: #d946ef;">Sultan Nails</h2>
                     <p>Grazie per esserti registrato!</p>
                     <p>Il tuo codice di verifica è:</p>
-                    <h1 style="background: #fff; padding: 10px; display: inline-block; border-radius: 8px; border: 1px solid #ddd; letter-spacing: 5px;">${otp}</h1>
-                    <p>Per attivare il tuo account, puoi anche cliccare sul pulsante qui sotto:</p>
-                    <a href="${verificationLink}" style="background-color: #d946ef; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin: 10px 0;">Verifica Email</a>
-                    <p style="font-size: 14px; color: #666;">Oppure copia questo link: <br> ${verificationLink}</p>
+                    <h1 style="background: #fff; padding: 10px; display: inline-block; border-radius: 8px; border: 1px solid #ddd; letter-spacing: 5px; color: #000;">${otp}</h1>
+                    <p>Il codice scade tra 15 minuti.</p>
                 </div>
             `
         });
@@ -76,16 +73,13 @@ export const emailService = {
     sendPasswordResetEmail: async (email: string, otp: string) => {
         await sendEmail({
             to: email,
-            subject: 'Codice di Recupero Password - Sultan Nails',
-            text: `Il tuo codice di recupero è: ${otp}\n\nIl codice scade tra 15 minuti.`,
+            subject: 'Recupero Password - Sultan Nails',
+            text: `Codice: ${otp}`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #d946ef;">Sultan Nails</h2>
-                    <p>Hai richiesto il ripristino della password.</p>
-                    <p>Il tuo codice OTP è:</p>
-                    <h1 style="background: #fff; padding: 10px; display: inline-block; border-radius: 8px; border: 1px solid #ddd;">${otp}</h1>
-                    <p>Il codice è valido per 15 minuti.</p>
-                    <p style="font-size: 12px; color: #666;">Se non hai richiesto questo codice, ignora questa email.</p>
+                <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                    <h2>Recupero Password</h2>
+                    <p>Il tuo codice OTP è: <strong>${otp}</strong></p>
+                    <p>Scade tra 15 minuti.</p>
                 </div>
             `
         });
@@ -94,237 +88,93 @@ export const emailService = {
     // 3. Notifica Admin: Nuova Registrazione
     sendAdminNewRegistrationEmail: async (email: string, firstName: string, lastName: string) => {
         if (!ADMIN_EMAIL) return;
-
         await sendEmail({
             to: ADMIN_EMAIL,
-            subject: '🔔 Nuova Registrazione Utente - Sultan Nails',
-            text: `Un nuovo utente si è registrato: ${firstName} ${lastName} (${email})`,
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #d946ef;">Nuova Registrazione</h2>
-                    <p>Un nuovo utente si è appena registrato sulla piattaforma.</p>
-                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                        <p><strong>Nome:</strong> ${firstName} ${lastName}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                    </div>
-                </div>
-            `
+            subject: '🔔 Nuova Registrazione',
+            text: `${firstName} ${lastName} si è registrato.`,
+            html: `<p>Nuovo utente: <strong>${firstName} ${lastName}</strong> (${email})</p>`
         });
     },
 
-    // 4. Notifica Utente: Prenotazione Creata (fix)
-    sendUserBookingCreatedEmail: async (email: string, booking: any) => {
-        const b = normalizeBooking(booking);  // ← Fix qui
-
-        const date = b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('it-IT') : 'Data non disponibile';
-        const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '';
-
-        await sendEmail({
-            to: email,
-            subject: '📅 Conferma Prenotazione Inviata - Sultan Nails',
-            text: `La tua prenotazione per ${b.serviceName || 'Servizio'} il ${date} alle ${time} è stata ricevuta.`,
-            html: `
-      <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-        <h2 style="color: #d946ef;">Prenotazione Ricevuta</h2>
-        <p>Ciao, abbiamo ricevuto la tua richiesta.</p>
-        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-          <p><strong>Servizio:</strong> ${b.serviceName || 'N/A'}</p>
-          <p><strong>Data:</strong> ${date}</p>
-          <p><strong>Ora:</strong> ${time}</p>
-          <p><strong>Stato:</strong> <span style="color: #f59e0b;">In attesa</span></p>
-        </div>
-      </div>
-    `
-        });
-    },
-
-    // 5. Notifica Admin: Nuova Prenotazione (fix)
+    // 4. Notifica Admin: Nuova Prenotazione
     sendAdminNewBookingEmail: async (user: any, booking: any) => {
         if (!ADMIN_EMAIL) return;
-
-        const b = normalizeBooking(booking);  // ← Fix qui
-
+        const b = normalizeBooking(booking);
         const date = b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('it-IT') : 'N/A';
         const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
 
         await sendEmail({
             to: ADMIN_EMAIL,
-            subject: '📅 Nuova Prenotazione - Sultan Nails',
-            text: `${user.firstName} ${user.lastName} ha prenotato ${b.serviceName} il ${date} alle ${time}.`,
+            subject: '📅 Nuova Prenotazione',
+            text: `Prenotazione da ${user.firstName}`,
             html: `
-      <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-        <h2 style="color: #d946ef;">Nuova Prenotazione</h2>
-        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-          <p><strong>Utente:</strong> ${user.firstName} ${user.lastName} (${user.email})</p>
-          <p><strong>Servizio:</strong> ${b.serviceName || 'N/A'}</p>
-          <p><strong>Data:</strong> ${date}</p>
-          <p><strong>Ora:</strong> ${time}</p>
-        </div>
-      </div>
-    `
+                <p><strong>Utente:</strong> ${user.firstName} ${user.lastName}</p>
+                <p><strong>Servizio:</strong> ${b.serviceName}</p>
+                <p><strong>Data:</strong> ${date} alle ${time}</p>
+            `
         });
     },
 
-    // 6. Status Update (fix)
-    sendBookingStatusUpdateEmail: async (email: string, booking: any, status: 'confirmed' | 'cancelled') => {
-        const b = normalizeBooking(booking);  // ← Fix qui
-
-        const date = b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('it-IT') : 'N/A';
-        const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
-        const isConfirmed = status === 'confirmed';
-        const subject = isConfirmed ? '✅ Prenotazione Confermata' : '❌ Prenotazione Cancellata';
-        const color = isConfirmed ? '#10b981' : '#ef4444';
-
-        await sendEmail({
-            to: email,
-            subject: `${subject} - Sultan Nails`,
-            text: `Prenotazione ${b.serviceName} ${date} ${time}: ${status}.`,
-            html: `
-      <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-        <h2 style="color: ${color};">${subject}</h2>
-        <div style="background: white; padding: 15px; border-radius: 8px;">
-          <p><strong>Servizio:</strong> ${b.serviceName}</p>
-          <p><strong>Data:</strong> ${date}</p>
-          <p><strong>Ora:</strong> ${time}</p>
-        </div>
-      </div>
-    `
-        });
-    },
-
-    // 7. Notifica Utente: Cancellazione
+    // 5. Notifica Utente: Cancellazione
     sendUserBookingCancelledEmail: async (email: string, booking: any) => {
         const b = normalizeBooking(booking);
-        const date = b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('it-IT') : 'N/A';
-        const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
         await sendEmail({
             to: email,
-            subject: '🗑️ Cancellazione Prenotazione - Sultan Nails',
-            text: `La tua prenotazione per ${b.serviceName} del ${date} alle ${time} è stata cancellata con successo.`,
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #ef4444;">Prenotazione Cancellata</h2>
-                    <p>La tua prenotazione è stata cancellata come richiesto.</p>
-                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                        <p><strong>Servizio:</strong> ${b.serviceName}</p>
-                        <p><strong>Data:</strong> ${date}</p>
-                        <p><strong>Ora:</strong> ${time}</p>
-                    </div>
-                </div>
-            `
+            subject: '🗑️ Prenotazione Cancellata',
+            text: `La prenotazione per ${b.serviceName} è stata cancellata.`,
+            html: `<p>La tua prenotazione per <strong>${b.serviceName}</strong> è stata cancellata.</p>`
         });
     },
 
-    // 8. Notifica Admin: Cancellazione Utente
+    // 6. Notifica Admin: Cancellazione Utente
     sendAdminBookingCancelledEmail: async (user: any, booking: any) => {
         if (!ADMIN_EMAIL) return;
-
         const b = normalizeBooking(booking);
-        const date = b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('it-IT') : 'N/A';
-        const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
         await sendEmail({
             to: ADMIN_EMAIL,
-            subject: '🗑️ Prenotazione Cancellata dall\'Utente - Sultan Nails',
-            text: `L'utente ${user.firstName} ${user.lastName} ha cancellato la prenotazione per ${b.serviceName} del ${date} alle ${time}.`,
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #ef4444;">Prenotazione Cancellata</h2>
-                    <p>Un utente ha cancellato una prenotazione.</p>
-                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                         <p><strong>Utente:</strong> ${user.firstName} ${user.lastName} (${user.email})</p>
-                        <p><strong>Servizio:</strong> ${b.serviceName}</p>
-                        <p><strong>Data:</strong> ${date}</p>
-                        <p><strong>Ora:</strong> ${time}</p>
-                    </div>
-                </div>
-            `
+            subject: '🗑️ Prenotazione Cancellata da Utente',
+            text: `${user.firstName} ha cancellato una prenotazione.`,
+            html: `<p>L'utente ${user.firstName} ha cancellato l'appuntamento per ${b.serviceName}.</p>`
         });
     },
 
-    // 9. Promemoria: Giorno stesso
+    sendBookingStatusUpdateEmail: async (email: string, booking: any, status: string) => {
+        const b = normalizeBooking(booking);
+        await sendEmail({
+            to: email,
+            subject: `Prenotazione ${status === 'confirmed' ? 'Confermata' : 'Aggiornata'}`,
+            text: `Lo stato della tua prenotazione è: ${status}`,
+            html: `<p>Il tuo appuntamento per ${b.serviceName} è ora: <strong>${status}</strong>.</p>`
+        });
+    },
+
+    sendBookingUpdateEmail: async (email: string, oldBooking: any, newBooking: any) => {
+        const newB = normalizeBooking(newBooking);
+        await sendEmail({
+            to: email,
+            subject: '✏️ Appuntamento Modificato',
+            text: `Nuova data per ${newB.serviceName}`,
+            html: `<p>Il tuo appuntamento è stato spostato.</p>`
+        });
+    },
+
     sendSameDayReminderEmail: async (email: string, booking: any) => {
         const b = normalizeBooking(booking);
-        const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
         await sendEmail({
             to: email,
-            subject: '⏰ Promemoria Appuntamento Oggi - Sultan Nails',
-            text: `Ciao, ricordati che oggi hai un appuntamento per ${b.serviceName} alle ore ${time}.`,
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #6b21a8;">Promemoria Appuntamento</h2>
-                    <p>Ciao! Ti ricordiamo il tuo appuntamento di oggi.</p>
-                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                        <p><strong>Servizio:</strong> ${b.serviceName}</p>
-                        <p><strong>Ora:</strong> ${time}</p>
-                        <p><strong>Luogo:</strong> Sultan Nails</p>
-                    </div>
-                    <p style="font-size: 14px; margin-top: 20px;">Ti aspettiamo!</p>
-                </div>
-            `
+            subject: '⏰ Promemoria Appuntamento Oggi',
+            text: `Ricordati l'appuntamento per ${b.serviceName}`,
+            html: `<p>Oggi hai un appuntamento per <strong>${b.serviceName}</strong>.</p>`
         });
     },
 
-    // 10. Promemoria: Settimanale
     sendWeeklyReminderEmail: async (email: string, booking: any, weeksUntil: number) => {
-        const b = normalizeBooking(booking);
-        const date = b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('it-IT') : 'N/A';
-        const time = b.bookingDate ? new Date(b.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
         await sendEmail({
             to: email,
-            subject: `📅 Tra ${weeksUntil} settimane: Appuntamento Sultan Nails`,
-            text: `Ciao, ti ricordiamo che tra ${weeksUntil} settimane (il ${date}) hai un appuntamento per ${b.serviceName}.`,
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #6b21a8;">Promemoria Appuntamento</h2>
-                    <p>Ciao! Un piccolo promemoria per il tuo futuro appuntamento.</p>
-                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
-                        <p><strong>Mancano:</strong> ${weeksUntil} settimane</p>
-                        <p><strong>Data:</strong> ${date}</p>
-                        <p><strong>Ora:</strong> ${time}</p>
-                        <p><strong>Servizio:</strong> ${b.serviceName}</p>
-                    </div>
-                </div>
-            `
-        });
-    },
-
-    // 11. Notifica Utente: Modifica Appuntamento (Admin)
-    sendBookingUpdateEmail: async (email: string, oldBooking: any, newBooking: any) => {
-        const oldB = normalizeBooking(oldBooking);
-        const newB = normalizeBooking(newBooking);
-
-        const oldDate = oldB.bookingDate ? new Date(oldB.bookingDate).toLocaleDateString('it-IT') : 'N/A';
-        const oldTime = oldB.bookingDate ? new Date(oldB.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
-        const newDate = newB.bookingDate ? new Date(newB.bookingDate).toLocaleDateString('it-IT') : 'N/A';
-        const newTime = newB.bookingDate ? new Date(newB.bookingDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-
-        await sendEmail({
-            to: email,
-            subject: '✏️ Appuntamento Modificato - Sultan Nails',
-            text: `Il tuo appuntamento è stato modificato.\n\nVecchi dettagli: ${oldB.serviceName} il ${oldDate} alle ${oldTime}\nNuovi dettagli: ${newB.serviceName} il ${newDate} alle ${newTime}`,
-            html: `
-                <div style="font-family: sans-serif; padding: 20px; background-color: #f9f9f9;">
-                    <h2 style="color: #d946ef;">Appuntamento Modificato</h2>
-                    <p>Gentile cliente, il tuo appuntamento è stato modificato dallo staff.</p>
-                    
-                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 20px;">
-                        <h3 style="margin-top: 0; color: #666;">Dettagli Aggiornati:</h3>
-                        <p><strong>Servizio:</strong> ${newB.serviceName}</p>
-                        <p><strong>Data:</strong> ${newDate}</p>
-                        <p><strong>Ora:</strong> ${newTime}</p>
-                    </div>
-
-                    <div style="background: #eee; padding: 15px; border-radius: 8px; color: #666; font-size: 14px;">
-                        <p><strong>Precedentemente:</strong> ${oldB.serviceName} il ${oldDate} alle ${oldTime}</p>
-                    </div>
-                </div>
-            `
+            subject: '📅 Promemoria Appuntamento',
+            text: `Mancano ${weeksUntil} settimane al tuo appuntamento.`,
+            html: `<p>Ti aspettiamo tra ${weeksUntil} settimane.</p>`
         });
     }
+
 };

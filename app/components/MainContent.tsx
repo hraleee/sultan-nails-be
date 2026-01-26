@@ -241,14 +241,15 @@ export default function MainContent() {
           <div className="relative overflow-hidden rounded-3xl border border-purple-200/10 bg-purple-500/10 p-8 shadow-inner grid place-items-center">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(250,232,255,0.15),transparent_50%)]" />
             <div className="relative flex flex-wrap gap-3 justify-center">
-              <a
-                href="https://wa.me/393391862999"
-                target="_blank"
-                rel="noreferrer"
+// ...
+              <Link
+                href="/login"
                 className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:-translate-y-1 transition-all"
               >
-                Prenota WhatsApp
-              </a>
+                Prenota Ora
+              </Link>
+// ...
+
               <a
                 href="/contatti"
                 className="rounded-full border-2 border-purple-200/40 bg-purple-500/10 px-8 py-4 text-base font-medium text-purple-100 hover:border-purple-200/60 hover:bg-purple-500/20 transition-all"

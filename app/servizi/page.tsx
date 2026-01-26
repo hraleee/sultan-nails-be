@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import Link from 'next/link';
 
 const services = [
   {
@@ -146,14 +147,17 @@ export default function ServiziPage() {
                       </ul>
                     </div>
 
-                    <a
-                      href="https://wa.me/393391862999"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-4 rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-0.5 hover:shadow-purple-500/50"
-                    >
-                      Prenota questo servizio
-                    </a>
+// ...
+                    <div className="mt-4">
+                      <Link
+                        href="/login"
+                        className="inline-block w-full rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-0.5 hover:shadow-purple-500/50"
+                      >
+                        Prenota questo servizio
+                      </Link>
+                    </div>
+// ...
+
                   </div>
                 </article>
               ))}

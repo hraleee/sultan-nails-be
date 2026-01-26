@@ -46,7 +46,7 @@ router.post(
 
         // User exists, not verified, password matches -> Resend OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
 
         await supabase
           .from('users')
