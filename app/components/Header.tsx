@@ -1,236 +1,143 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import { authApi, type User } from "@/lib/api";
+import { useEffect, useRef, useState } from "react";
 
 const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Servizi", href: "/servizi" },
+  { label: "Services", href: "/servizi" },
   { label: "Palette", href: "/palette" },
-  { label: "Pacchetti", href: "/pacchetti" },
-  { label: "Contatti", href: "/contatti" },
+  { label: "Packages", href: "/pacchetti" },
+  { label: "Book now", href: "/contatti" },
 ];
 
 export default function Header() {
+  const [visible, setVisible] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const close = () => setOpen(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
-    // Check auth state safely
-    const checkAuth = () => {
-      try {
-        setUser(authApi.getUser());
-      } catch (error) {
-        console.error('Error checking auth:', error);
-        setUser(null);
+    const onScroll = () => {
+      const currentY = window.scrollY;
+      setScrolled(currentY > 12);
+
+      if (currentY <= 12) {
+        setVisible(true);
+      } else if (currentY > lastScrollY.current + 6) {
+        setVisible(false);
+      } else if (currentY < lastScrollY.current - 6) {
+        setVisible(true);
       }
+
+      lastScrollY.current = currentY;
     };
 
-    checkAuth();
-
-    // Listen to storage changes (for logout in other tabs)
-    const handleStorageChange = () => {
-      checkAuth();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Check on route changes
-    const interval = setInterval(checkAuth, 2000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!visible) setOpen(false);
+  }, [visible]);
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-[999] border-b border-white/10 bg-gradient-to-b from-black/80 via-black/90 to-black/95 backdrop-blur-xl shadow-2xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-light tracking-widest bg-gradient-to-r from-purple-200 to-fuchsia-200 bg-clip-text text-transparent uppercase">
-              Sultan Nails
-            </span>
-          </div>
-
-          <nav className="hidden items-center gap-5 md:flex">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="group rounded-full px-4 py-2.5 text-sm font-semibold text-white/80 transition-all duration-200 hover:bg-white/10 hover:text-white hover:-translate-y-0.5"
-              >
-                {link.label}
-              </a>
-            ))}
-            {user ? (
-              <Link
-                href={user.role === 'admin' ? '/admin' : '/area-utente'}
-                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all duration-200"
-              >
-                {user.role === 'admin' ? 'Admin' : 'Area Utente'}
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all duration-200"
-              >
-                Accedi
-              </Link>
-
-
-            )}
-          </nav>
-
-          <button
-            className="group flex h-12 w-12 items-center justify-center rounded-full border-2 border-white/20 bg-white/10 backdrop-blur-sm md:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Apri menu"
-          >
-            <div className="flex flex-col gap-1.5 p-1">
-              <span className="block h-[2px] w-6 rounded-full bg-white transition-all group-hover:w-5" />
-              <span className="block h-[2px] w-5 rounded-full bg-white/80 transition-all group-hover:w-6" />
-              <span className="block h-[2px] w-6 rounded-full bg-white transition-all group-hover:w-5" />
+      <header
+        className={`fixed left-0 right-0 top-0 z-[999] px-4 pt-4 transition-transform duration-300 sm:px-6 lg:px-8 ${
+          visible ? "translate-y-0" : "-translate-y-[140%]"
+        }`}
+      >
+        <div
+          className={`mx-auto max-w-[1480px] rounded-[14px] border transition-all duration-300 ${
+            scrolled
+              ? "border-white/25 bg-[linear-gradient(90deg,rgba(11,11,16,0.88),rgba(26,26,38,0.88),rgba(20,27,38,0.88))] shadow-[0_18px_40px_rgba(0,0,0,0.34)] backdrop-blur-md"
+              : "border-white/20 bg-[linear-gradient(90deg,rgba(14,14,18,0.72),rgba(28,26,36,0.72),rgba(17,24,34,0.7))] shadow-[0_14px_30px_rgba(0,0,0,0.24)] backdrop-blur-[6px]"
+          }`}
+        >
+          <div className="relative flex items-center justify-between gap-4 rounded-[14px] border-t border-l border-white/20 border-r border-b border-r-black/35 border-b-black/35 px-4 py-3 sm:px-6">
+            <div className="hidden flex-1 items-center gap-3 md:flex">
+              {navLinks.slice(0, 2).map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="inline-flex min-h-[40px] items-center rounded-[10px] border border-white/15 bg-white/5 px-4 font-hud text-[10px] uppercase tracking-[0.18em] text-white/72 transition-colors hover:bg-white/10 hover:text-[#ff53b6]"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
-          </button>
+
+            <button
+              className="absolute left-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-[10px] border border-white/15 bg-white/5 text-white/80 transition-colors hover:text-[#ff53b6] md:hidden"
+              onClick={() => setOpen((value) => !value)}
+              aria-label="Apri menu"
+            >
+              <span className="flex flex-col gap-[5px]">
+                <span className={`block h-[1.5px] bg-current transition-all duration-300 ${open ? "w-5 translate-y-[6.5px] rotate-45" : "w-5"}`} />
+                <span className={`block h-[1.5px] bg-current transition-all duration-300 ${open ? "opacity-0" : "w-4"}`} />
+                <span className={`block h-[1.5px] bg-current transition-all duration-300 ${open ? "w-5 -translate-y-[6.5px] -rotate-45" : "w-5"}`} />
+              </span>
+            </button>
+
+            <div className="flex flex-1 justify-center md:flex-none">
+              <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+                <img
+                  src="/logo-header.png"
+                  alt="Sultan Nails"
+                  className="h-auto w-36 object-contain sm:w-40 md:w-44"
+                />
+              </Link>
+            </div>
+
+            <div className="hidden flex-1 items-center justify-end gap-3 md:flex">
+              {navLinks.slice(2).map((link, index) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`inline-flex min-h-[40px] items-center rounded-[10px] border px-4 font-hud text-[10px] uppercase tracking-[0.18em] transition-colors ${
+                    index === 1
+                      ? "border-[#ff53b6]/35 bg-[#ff53b6]/12 text-[#ff87cd] hover:bg-[#ff53b6]/18"
+                      : "border-white/15 bg-white/5 text-white/72 hover:bg-white/10 hover:text-[#ff53b6]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+          </div>
         </div>
       </header>
 
-      {/* SIDEBAR MODALE - FUORI DALL'HEADER PER COPRIRE TUTTO LO SCHERMO */}
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-[1000] bg-black/75 backdrop-blur-md md:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              onClick={close}
-            />
-            <motion.aside
-              className="fixed inset-y-0 left-0 z-[1001] w-[75vw] max-w-sm border-r border-white/20 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.95)] backdrop-blur-xl md:hidden"
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              {/* Background Layer */}
-              <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a12] via-[#0f0f18] to-[#080810] opacity-95" />
-              <div className="absolute inset-0 bg-[#0c0c13]/98" />
-
-              {/* Content */}
-              <div className="relative z-10 h-full overflow-y-auto">
-                {/* Profile Header */}
-                <div className="p-8 pb-6 border-b border-white/10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-
-                      <div className="relative shrink-0">
-                        {/* Usa img vanilla, no Next/Image */}
-                        <img
-                          src="/sultannailslogo.jpg"
-                          alt="Sultan Nails Logo"
-                          className="h-20 w-20 rounded-2xl border-4 border-white/20 shadow-2xl object-cover"
-                        /> <div className="absolute -bottom-2 -right-2 h-8 w-8 rounded-2xl bg-gradient-to-r from-fuchsia-400 to-rose-400 shadow-xl animate-pulse" />
-                      </div>
-                      <div>
-                        <div className="text-sm uppercase tracking-[0.3em] text-fuchsia-200 mb-1">
-                          Studio
-                        </div>
-                        <h1 className="text-2xl font-black bg-gradient-to-r from-white via-fuchsia-100/90 to-white bg-clip-text text-transparent">
-                          Sultan Nails
-                        </h1>
-                      </div>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 0.95 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={close}
-                      className="p-2 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-200"
-                    >
-                      <svg
-                        className="h-6 w-6 text-white/80"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </motion.button>
-                  </div>
-                  <div className="space-y-1 text-sm text-white/70">
-                    <div>Via Corso Umbero I n 52, Casalnuovo di Napoli</div>
-                    <div className="text-xs uppercase tracking-wider text-fuchsia-200/80">
-                      Lun-Ven 9-19
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation */}
-                <nav className="px-8 py-8 space-y-2">
-                  {navLinks.map((link, index) => (
-                    <motion.a
-                      key={link.href}
-                      href={link.href}
-                      onClick={close}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.08 }}
-                      className="group flex items-center gap-4 p-5 rounded-3xl text-lg font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/15 hover:text-white hover:shadow-xl hover:shadow-fuchsia-500/30 transition-all duration-300"
-                    >
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-fuchsia-400 to-sky-400 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300" />
-                      <span>{link.label}</span>
-                    </motion.a>
-                  ))}
-                </nav>
-
-                {/* CTA */}
-                <div className="px-8 pb-10 pt-4 border-t border-white/10 space-y-4">
-                  {user ? (
-                    <motion.a
-                      whileHover={{ y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      href={user.role === 'admin' ? '/admin' : '/area-utente'}
-                      onClick={close}
-                      className="w-full flex items-center justify-center gap-3 rounded-4xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-6 text-xl font-black text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all duration-300"
-                    >
-                      {user.role === 'admin' ? 'Admin' : 'Area Utente'}
-                    </motion.a>
-                  ) : (
-                    <motion.a
-                      whileHover={{ y: -3 }}
-                      whileTap={{ scale: 0.98 }}
-                      href="/login"
-                      onClick={close}
-                      className="w-full flex items-center justify-center gap-3 rounded-4xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-6 text-xl font-black text-white shadow-2xl shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all duration-300"
-                    >
-                      Accedi
-                    </motion.a>
-                  )}
-
-
-                  <a
-                    href="tel:+393391862999"
-                    className="block w-full rounded-2xl border-2 border-white/30 bg-white/10 px-6 py-4 text-center font-bold text-white backdrop-blur-sm hover:border-white hover:bg-white/20 transition-all duration-200"
-                  >
-                    📞 +39 339 186 2999
-                  </a>
-                </div>
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[998] bg-black/35 backdrop-blur-[2px] md:hidden" onClick={() => setOpen(false)}>
+          <div
+            className="absolute left-4 right-4 top-[88px] rounded-[16px] border border-white/15 bg-[linear-gradient(180deg,rgba(16,16,22,0.96),rgba(25,24,36,0.96))] p-4 shadow-[0_22px_40px_rgba(0,0,0,0.35)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-3 font-hud text-[9px] uppercase tracking-[0.22em] text-white/45">
+              navigation
+            </div>
+            <div className="flex flex-col gap-3">
+              {navLinks.map((link, index) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`inline-flex min-h-[44px] items-center rounded-[10px] border px-4 font-hud text-[10px] uppercase tracking-[0.18em] ${
+                    index === 3
+                      ? "border-[#ff53b6]/35 bg-[#ff53b6]/12 text-[#ff87cd]"
+                      : "border-white/12 bg-white/5 text-white/78"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

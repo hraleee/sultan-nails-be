@@ -1,0 +1,762 @@
+.page {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 50, 180, 0.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(160, 220, 255, 0.12), transparent 18%),
+    linear-gradient(180deg, #040406 0%, #09090d 36%, #0d0d12 100%);
+  color: #fff;
+}
+
+.background,
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+}
+
+.background {
+  overflow: hidden;
+  opacity: 1;
+  background-image: url("/hellobg.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(53, 53, 71, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(53, 53, 71, 0.03) 1px, transparent 1px);
+  background-size: 36px 36px, 36px 36px;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat, repeat;
+  opacity: 0.22;
+}
+
+.backgroundVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  background: transparent;
+}
+
+.grain {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.32) 0, transparent 24%),
+    radial-gradient(circle at 80% 30%, rgba(255, 90, 180, 0.08) 0, transparent 18%),
+    radial-gradient(circle at 30% 80%, rgba(72, 88, 255, 0.06) 0, transparent 20%);
+  mix-blend-mode: multiply;
+  opacity: 0.12;
+  filter: blur(10px);
+}
+
+.heroSection,
+.windowsSection,
+.collageSection {
+  position: relative;
+  z-index: 1;
+  padding-inline: 24px;
+}
+
+.heroSection {
+  padding-top: 118px;
+  padding-bottom: 48px;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 28px;
+  align-items: center;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 2;
+}
+
+.kicker {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #253056;
+  font-family: var(--font-hud);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-poster);
+  font-size: clamp(4.4rem, 9vw, 8.8rem);
+  line-height: 0.86;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow:
+    2px 2px 0 rgba(8, 8, 20, 0.65),
+    6px 6px 0 rgba(255, 61, 172, 0.16);
+}
+
+.lead {
+  max-width: 520px;
+  margin-top: 18px;
+  font-family: var(--font-hud);
+  font-size: 13px;
+  line-height: 1.9;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.primaryButton,
+.secondaryButton,
+.glossyAction,
+.glossyActionSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-family: var(--font-hud);
+  font-size: 11px;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.primaryButton,
+.glossyAction {
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #676775;
+  border-bottom: 2px solid #676775;
+  background:
+    linear-gradient(180deg, #fafaff, #deddf2);
+  color: #23243b;
+  box-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.secondaryButton,
+.glossyActionSecondary {
+  border-top: 2px solid #ffd6ec;
+  border-left: 2px solid #ffd6ec;
+  border-right: 2px solid #ad4a83;
+  border-bottom: 2px solid #ad4a83;
+  background:
+    linear-gradient(180deg, #ff8fcb, #ff56b8);
+  color: #fff;
+  box-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.glossyAction:hover,
+.glossyActionSecondary:hover {
+  transform: translateY(-1px);
+}
+
+.stickerRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border-radius: 2px;
+  transform: rotate(-3deg);
+  font-family: var(--font-hud);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.24);
+}
+
+.stickerPink {
+  background: #ff4bb3;
+  color: #fff;
+}
+
+.stickerGreen {
+  transform: rotate(3deg);
+  background: #dfe4f6;
+  color: #243050;
+}
+
+.heroVisual {
+  position: relative;
+  min-height: 780px;
+}
+
+.heroBubble {
+  position: absolute;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #545454;
+  border-bottom: 2px solid #545454;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #daddea);
+  color: #4d5377;
+  text-decoration: none;
+  box-shadow:
+    4px 4px 0 rgba(0, 0, 0, 0.2);
+  font-family: var(--font-hud);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.heroBubbleIcon {
+  color: #ff4bb3;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.bubbleTopLeft {
+  left: 0;
+  top: 9%;
+}
+
+.bubbleTopRight {
+  right: 0;
+  top: 13%;
+}
+
+.bubbleMidLeft {
+  left: 4%;
+  top: 43%;
+}
+
+.bubbleMidRight {
+  right: 2%;
+  top: 49%;
+}
+
+.posterFrame,
+.chatWindow,
+.profileCard,
+.panel,
+.phoneCard,
+.miniProfile {
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #5f5f5f;
+  border-bottom: 2px solid #5f5f5f;
+  background: #c9c9c9;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.18);
+}
+
+.posterFrame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  padding: 4px;
+  background: #c9c9c9;
+}
+
+.posterTopBar,
+.windowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 6px;
+  border-radius: 0;
+  background: linear-gradient(90deg, #0817a3 0%, #1736d0 70%, #4f75ff 100%);
+  color: #ffffff;
+  font-family: var(--font-hud);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.titleBarText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.titleBarControls {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.titleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-top: 1px solid #ffffff;
+  border-left: 1px solid #ffffff;
+  border-right: 1px solid #4f4f4f;
+  border-bottom: 1px solid #4f4f4f;
+  background: #d8d8d8;
+  color: #111;
+  font-family: monospace;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.menuStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 6px 10px;
+  color: #171717;
+  font-family: var(--font-hud);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.posterMain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 16px;
+  gap: 10px;
+  margin-top: 0;
+  padding: 0 6px 6px;
+}
+
+.posterPhotoWrap {
+  position: relative;
+  min-height: 530px;
+  overflow: hidden;
+  border: 2px inset #d9d9d9;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.posterPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(1.1) contrast(1.02);
+}
+
+.posterBadge,
+.posterSticker,
+.panelLabel,
+.profileChip,
+.framedTag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 2px;
+  font-family: var(--font-hud);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.posterBadge {
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  background: #ffe85c;
+  color: #413300;
+}
+
+.posterSticker {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  transform: rotate(-5deg);
+  background: #fff;
+  color: #1736d0;
+}
+
+.panelLabel,
+.profileChip,
+.framedTag {
+  background: #f4f4fb;
+  color: #3150d2;
+  border: 1px solid #8b8b8b;
+}
+
+.posterSidebar {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.phoneCard,
+.miniProfile {
+  padding: 8px;
+  border-radius: 0;
+}
+
+.phoneImage {
+  display: block;
+  width: 100%;
+  height: 280px;
+  margin-top: 10px;
+  object-fit: cover;
+  border-radius: 0;
+  border: 2px inset #d9d9d9;
+}
+
+.profileName {
+  margin-top: 12px;
+  font-family: var(--font-poster);
+  font-size: 1.9rem;
+  line-height: 0.95;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profileMeta {
+  margin-top: 10px;
+  color: #4b4b58;
+  font-family: var(--font-hud);
+  font-size: 10px;
+  line-height: 1.7;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.posterFooter {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.footerThumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.thumb {
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  background: #111;
+}
+
+.thumbImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbText,
+.posterTinyText {
+  font-family: var(--font-hud);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #41414d;
+}
+
+.windowsSection {
+  padding-top: 24px;
+}
+
+.windowsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.chatWindow {
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.chatBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  background: #c9c9c9;
+}
+
+.chatLine {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 86%;
+}
+
+.chatLeft {
+  align-items: flex-start;
+}
+
+.chatRight {
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.chatMeta {
+  color: #3140a4;
+  font-family: var(--font-hud);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.chatBubble {
+  padding: 14px 18px;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #7a7a7a;
+  border-bottom: 2px solid #7a7a7a;
+  border-radius: 2px;
+  background: #ffffff;
+  color: #222;
+  font-family: var(--font-hud);
+  font-size: 11px;
+  line-height: 1.7;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.chatRight .chatBubble {
+  background: #ffd4eb;
+  color: #652859;
+}
+
+.profileStack {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.profileCard {
+  border-radius: 0;
+  padding: 12px;
+}
+
+.profileCardTiltLeft {
+  transform: rotate(-2deg);
+}
+
+.profileCardTiltRight {
+  transform: rotate(2deg);
+}
+
+.profileCardTitle {
+  margin: 14px 0 0;
+  font-family: var(--font-poster);
+  font-size: 2.4rem;
+  line-height: 0.95;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profileCardCopy {
+  margin-top: 12px;
+  color: #4f4f5c;
+  font-family: var(--font-hud);
+  font-size: 10px;
+  line-height: 1.9;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profileChip {
+  margin-top: 18px;
+}
+
+.collageSection {
+  padding-top: 24px;
+  padding-bottom: 72px;
+}
+
+.collageGrid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 0.8fr;
+  gap: 22px;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.panel {
+  border-radius: 0;
+  padding: 4px;
+}
+
+.panelLarge {
+  transform: rotate(-1.3deg);
+}
+
+.panelSmall {
+  min-height: 100%;
+}
+
+.framedImage {
+  position: relative;
+  margin-top: 0;
+  overflow: hidden;
+  border: 2px inset #d9d9d9;
+  border-radius: 0;
+  min-height: 300px;
+  background: #ffffff;
+}
+
+.framedImageAsset {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.framedTag {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  background: #ffffff;
+  color: #ff49af;
+}
+
+.reactionCloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.reaction {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #777777;
+  border-bottom: 2px solid #777777;
+  border-radius: 2px;
+  background: #f2f2f2;
+  color: #1d1d1d;
+  font-family: var(--font-hud);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.buttonStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+@media (max-width: 1100px) {
+  .heroGrid,
+  .windowsGrid,
+  .collageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroVisual {
+    min-height: auto;
+  }
+
+  .posterMain {
+    grid-template-columns: 1fr;
+  }
+
+  .heroBubble {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .heroSection,
+  .windowsSection,
+  .collageSection {
+    padding-inline: 16px;
+  }
+
+  .heroSection {
+    padding-top: 100px;
+  }
+
+  .kicker,
+  .lead,
+  .thumbText,
+  .posterTinyText,
+  .chatMeta,
+  .chatBubble,
+  .profileCardCopy,
+  .reaction,
+  .profileMeta {
+    letter-spacing: 0.08em;
+  }
+
+  .posterFrame,
+  .chatWindow,
+  .profileCard,
+  .panel,
+  .phoneCard,
+  .miniProfile {
+    border-radius: 0;
+  }
+
+  .posterPhotoWrap {
+    min-height: 380px;
+  }
+
+  .phoneImage {
+    height: 220px;
+  }
+
+  .posterFooter {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .thumb {
+    width: 62px;
+    height: 62px;
+  }
+}

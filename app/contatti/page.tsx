@@ -2,45 +2,45 @@ import Header from "../components/Header";
 
 const contactMethods = [
   {
-    icon: "📱",
     title: "WhatsApp",
     description: "Il modo più veloce per prenotare",
     value: "+39 339 186 2999",
     link: "https://wa.me/393391862999",
     cta: "Scrivici ora",
+    external: true,
   },
   {
-    icon: "📞",
     title: "Telefono",
     description: "Chiamaci direttamente",
     value: "+39 339 186 2999",
     link: "tel:+393391862999",
     cta: "Chiama ora",
+    external: false,
   },
   {
-    icon: "✉️",
     title: "Email",
     description: "Per informazioni generali",
     value: "sultan.nails.store@gmail.com",
-    link: "sultan.nails.store@gmail.com",
+    link: "mailto:sultan.nails.store@gmail.com",
     cta: "Invia email",
+    external: false,
   },
   {
-    icon: "📍",
     title: "Indirizzo",
     description: "Vieni a trovarci",
     value: "Via Corso Umberto I 52, Casalnuovo di Napoli",
-    link: "https://maps.google.com/?q=Via+Corso+Umberto+I+52+Casalnuovo+di+Napoli",
+    link: "https://maps.app.goo.gl/t3w1A8m83u4dVyVW8",
     cta: "Apri in Maps",
+    external: true,
   },
 ];
 
 const openingHours = [
-  { day: "Lunedì", hours: "09:00 - 19:00", closed: false },
-  { day: "Martedì", hours: "09:00 - 19:00", closed: false },
-  { day: "Mercoledì", hours: "09:00 - 19:00", closed: false },
-  { day: "Giovedì", hours: "09:00 - 19:00", closed: false },
-  { day: "Venerdì", hours: "09:00 - 19:00", closed: false },
+  { day: "Lunedì", hours: "09:00 – 19:00", closed: false },
+  { day: "Martedì", hours: "09:00 – 19:00", closed: false },
+  { day: "Mercoledì", hours: "09:00 – 19:00", closed: false },
+  { day: "Giovedì", hours: "09:00 – 19:00", closed: false },
+  { day: "Venerdì", hours: "09:00 – 19:00", closed: false },
   { day: "Sabato", hours: "Chiuso", closed: true },
   { day: "Domenica", hours: "Chiuso", closed: true },
 ];
@@ -48,54 +48,27 @@ const openingHours = [
 const faq = [
   {
     question: "Come posso prenotare un appuntamento?",
-    answer:
-      "Puoi prenotare tramite WhatsApp, telefono o compilando il form online. Ti risponderemo entro poche ore per confermare data e orario.",
+    answer: "Puoi prenotare tramite WhatsApp, telefono o dal tuo account online. Ti risponderemo entro poche ore per confermare data e orario.",
   },
   {
     question: "Quanto tempo prima devo prenotare?",
-    answer:
-      "Consigliamo di prenotare con almeno 3-5 giorni di anticipo, specialmente per i weekend. Per servizi specifici o eventi speciali, contattaci con più anticipo.",
+    answer: "Consigliamo almeno 3–5 giorni di anticipo, specialmente per i weekend. Per eventi speciali, contattaci prima.",
   },
   {
     question: "Quali metodi di pagamento accettate?",
-    answer:
-      "Accettiamo contanti, carte di credito/debito, bancomat e pagamenti digitali (Satispay, PayPal). Per gli abbonamenti mensili è possibile impostare il bonifico automatico.",
+    answer: "Accettiamo contanti, carte di credito/debito, bancomat e pagamenti digitali (Satispay, PayPal).",
   },
   {
     question: "Posso cancellare o spostare l'appuntamento?",
-    answer:
-      "Certo! Ti chiediamo cortesemente di avvisarci almeno 24 ore prima per permetterci di gestire al meglio gli appuntamenti.",
+    answer: "Sì! Ti chiediamo cortesemente di avvisarci almeno 24 ore prima.",
   },
   {
     question: "Offrite servizi a domicilio?",
-    answer:
-      "Sì, offriamo servizi a domicilio per occasioni speciali come matrimoni o eventi. Contattaci per maggiori informazioni e preventivi personalizzati.",
+    answer: "Sì, per occasioni speciali come matrimoni o eventi. Contattaci per informazioni e preventivi.",
   },
   {
     question: "I prodotti sono sicuri e certificati?",
-    answer:
-      "Assolutamente sì! Utilizziamo solo prodotti certificati EU, testati dermatologicamente e di alta qualità. Tutti gli strumenti sono sterilizzati professionalmente.",
-  },
-];
-
-const socialMedia = [
-  {
-    name: "Instagram",
-    handle: "@sultanyan__",
-    icon: "📸",
-    link: "https://instagram.com/sultanyan__",
-  },
-  {
-    name: "Facebook",
-    handle: "Sultan Nails",
-    icon: "👍",
-    link: "https://facebook.com/sultannails",
-  },
-  {
-    name: "TikTok",
-    handle: "@sultannails",
-    icon: "🎵",
-    link: "https://tiktok.com/@sultannails",
+    answer: "Assolutamente sì! Solo prodotti certificati EU, testati dermatologicamente. Strumenti sterilizzati professionalmente.",
   },
 ];
 
@@ -103,231 +76,199 @@ export default function ContattiPage() {
   return (
     <>
       <Header />
-      <main className="relative isolate overflow-hidden text-white pt-24">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,232,255,0.15),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(171,226,255,0.12),transparent_40%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-[#0f1018]/80 to-[#080810]" />
+      <main className="text-neutral-900" style={{ paddingTop: 68 }}>
 
-        <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-20 pt-8 sm:px-10 lg:px-14">
-          {/* Hero Section */}
-          <section className="flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/20 bg-purple-500/5 px-4 py-2 text-xs font-light uppercase tracking-[0.2em] text-purple-100 w-fit">
+        {/* ─── PAGE HEADER ─── */}
+        <section className="border-b border-neutral-200 bg-neutral-50">
+          <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
               Contattaci
-            </div>
-            <h1 className="text-4xl font-light tracking-wide leading-tight sm:text-5xl lg:text-6xl text-white">
-              Siamo qui <span className="text-purple-200 font-thin">per te</span>
-            </h1>
-            <p className="max-w-3xl text-lg text-white/70 font-light sm:text-xl leading-relaxed">
-              Hai domande o vuoi prenotare un appuntamento? Contattaci con il
-              metodo che preferisci. Rispondiamo sempre entro poche ore!
             </p>
-          </section>
+            <h1 className="text-4xl font-light leading-tight tracking-wide text-neutral-900 sm:text-5xl">
+              Siamo qui per te
+            </h1>
+            <p className="mt-4 max-w-2xl text-lg text-neutral-500 font-light leading-relaxed">
+              Hai domande o vuoi prenotare? Contattaci con il metodo che preferisci.
+              Rispondiamo sempre entro poche ore.
+            </p>
+          </div>
+        </section>
 
-          {/* Contact Methods */}
-          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {contactMethods.map((method) => (
+        {/* ─── CONTACT CARDS ─── */}
+        <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {contactMethods.map((m) => (
               <div
-                key={method.title}
-                className="group rounded-2xl border border-purple-200/10 bg-purple-500/5 p-6 transition hover:-translate-y-1 hover:border-purple-200/30 hover:bg-purple-500/10"
+                key={m.title}
+                className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-6"
               >
-                <div className="text-4xl mb-4 grayscale brightness-125 opacity-80">{method.icon}</div>
-                <h3 className="text-xl font-light text-purple-50 tracking-wide mb-2">{method.title}</h3>
-                <p className="text-sm text-white/60 font-light mb-3">
-                  {method.description}
+                <h3 className="mb-1 font-medium text-neutral-900">{m.title}</h3>
+                <p className="mb-3 text-sm text-neutral-500 font-light">{m.description}</p>
+                <p className="mb-5 flex-1 text-sm font-medium text-neutral-700 break-all">
+                  {m.value}
                 </p>
-                <div className="font-medium text-purple-100 mb-4 text-sm">
-                  {method.value}
-                </div>
                 <a
-                  href={method.link}
-                  target={method.link.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    method.link.startsWith("http") ? "noreferrer" : undefined
-                  }
-                  className="inline-block rounded-full bg-purple-500/10 border border-purple-200/20 px-4 py-2 text-sm font-medium text-purple-100 transition hover:bg-purple-500/20 hover:border-purple-200/40"
+                  href={m.link}
+                  target={m.external ? "_blank" : undefined}
+                  rel={m.external ? "noreferrer" : undefined}
+                  className="inline-block rounded-full border border-neutral-200 px-4 py-2 text-center text-sm font-medium text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50 transition"
                 >
-                  {method.cta}
+                  {m.cta}
                 </a>
               </div>
             ))}
-          </section>
+          </div>
+        </section>
 
-          {/* Opening Hours */}
-          <section className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl border border-purple-200/10 bg-purple-900/5 p-8 space-y-6 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.4)] backdrop-blur-md">
-              <div>
-                <h2 className="text-3xl font-light tracking-wide mb-2 text-white">Orari</h2>
-                <p className="text-white/60 font-light">
-                  Siamo aperti dal lunedì al venerdì
+        {/* ─── ORARI + DOVE SIAMO ─── */}
+        <section className="border-t border-neutral-200 bg-neutral-50">
+          <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+            <div className="grid gap-8 lg:grid-cols-2">
+
+              {/* Orari */}
+              <div className="rounded-2xl border border-neutral-200 bg-white p-8">
+                <h2 className="mb-1 text-2xl font-light text-neutral-900">Orari</h2>
+                <p className="mb-6 text-sm text-neutral-500 font-light">
+                  Aperti dal lunedì al venerdì
+                </p>
+                <div className="space-y-2">
+                  {openingHours.map((h) => (
+                    <div
+                      key={h.day}
+                      className={`flex items-center justify-between rounded-xl border border-neutral-100 px-4 py-3 text-sm ${
+                        h.closed ? "opacity-40" : ""
+                      }`}
+                    >
+                      <span className="font-light text-neutral-700">{h.day}</span>
+                      <span className={h.closed ? "text-neutral-500" : "font-medium text-neutral-900"}>
+                        {h.hours}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-5 text-xs text-neutral-400 font-light">
+                  Su prenotazione. Chiuso nei festivi nazionali.
                 </p>
               </div>
-              <div className="space-y-3">
-                {openingHours.map((item) => (
-                  <div
-                    key={item.day}
-                    className={`flex items-center justify-between rounded-xl border border-purple-200/5 bg-purple-500/5 px-5 py-3 ${item.closed ? "opacity-50" : ""
-                      }`}
-                  >
-                    <span className="font-light text-white/90">{item.day}</span>
-                    <span
-                      className={
-                        item.closed ? "text-white/50 font-light" : "text-purple-200 font-medium"
-                      }
-                    >
-                      {item.hours}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="pt-4 border-t border-purple-200/10">
-                <div className="text-sm text-white/50 font-light">
-                  💡 Appuntamenti su prenotazione. Chiuso festivi nazionali.
-                </div>
-              </div>
-            </div>
 
-            {/* Location Info */}
-            <div className="rounded-3xl border border-purple-200/10 bg-gradient-to-br from-purple-500/10 via-white/5 to-sky-400/5 p-8 space-y-6 shadow-inner">
-              <div>
-                <h2 className="text-3xl font-light tracking-wide mb-2 text-white">Dove siamo</h2>
-                <p className="text-white/60 font-light">
+              {/* Dove siamo */}
+              <div className="rounded-2xl border border-neutral-200 bg-white p-8 flex flex-col">
+                <h2 className="mb-1 text-2xl font-light text-neutral-900">Dove siamo</h2>
+                <p className="mb-6 text-sm text-neutral-500 font-light">
                   Nel cuore di Casalnuovo, facilmente raggiungibile
                 </p>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <span className="text-2xl grayscale opacity-80">📍</span>
+                <div className="flex-1 space-y-5">
                   <div>
-                    <div className="font-medium text-white mb-1">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-neutral-400">
                       Indirizzo
-                    </div>
-                    <div className="text-white/70 font-light text-sm leading-relaxed">
-                      Via Corso Umberto I 52
-                      <br />
-                      80013 Casalnuovo di Napoli (NA)
-                      <br />
+                    </p>
+                    <p className="text-sm text-neutral-600 font-light leading-relaxed">
+                      Via Corso Umberto I 52<br />
+                      80013 Casalnuovo di Napoli (NA)<br />
                       Italia
-                    </div>
+                    </p>
                   </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <span className="text-2xl grayscale opacity-80">🚗</span>
                   <div>
-                    <div className="font-medium text-white mb-1">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-neutral-400">
                       Parcheggio
-                    </div>
-                    <div className="text-white/70 font-light text-sm">
+                    </p>
+                    <p className="text-sm text-neutral-600 font-light">
                       Parcheggio pubblico a 2 minuti a piedi
-                    </div>
+                    </p>
                   </div>
                 </div>
-              </div>
-              <a
-                href="https://maps.app.goo.gl/t3w1A8m83u4dVyVW8"
-                target="_blank"
-                rel="noreferrer"
-                className="block w-full rounded-full bg-purple-500/10 border border-purple-200/30 px-6 py-3 text-center font-medium text-white transition hover:bg-purple-500/20 hover:border-purple-200/50"
-              >
-                Apri su Google Maps
-              </a>
-            </div>
-          </section>
-
-          {/* Social Media */}
-          <section className="rounded-3xl border border-purple-200/10 bg-purple-900/5 p-8 space-y-6">
-            <div>
-              <h2 className="text-3xl font-light tracking-wide mb-2 text-white">
-                Seguici sui social
-              </h2>
-              <p className="text-white/60 font-light">
-                Scopri le nostre ultime creazioni e le novità del momento
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {socialMedia.map((social) => (
                 <a
-                  key={social.name}
-                  href={social.link}
+                  href="https://maps.app.goo.gl/t3w1A8m83u4dVyVW8"
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex items-center gap-4 rounded-2xl border border-purple-200/10 bg-purple-500/5 p-5 transition hover:-translate-y-1 hover:border-purple-200/30 hover:bg-purple-500/10"
+                  className="mt-8 block w-full rounded-full bg-neutral-900 py-3 text-center text-sm font-semibold text-white hover:bg-neutral-700 transition"
                 >
-                  <span className="text-3xl grayscale brightness-125 opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition">{social.icon}</span>
-                  <div>
-                    <div className="font-medium text-white group-hover:text-purple-200 transition">
-                      {social.name}
-                    </div>
-                    <div className="text-sm text-white/50 font-light">{social.handle}</div>
-                  </div>
+                  Apri su Google Maps
                 </a>
-              ))}
-            </div>
-          </section>
-
-          {/* FAQ */}
-          <section className="space-y-6">
-            <div>
-              <h2 className="text-3xl font-light tracking-wide mb-2 text-white">Domande frequenti</h2>
-              <p className="text-white/60 font-light">
-                Le risposte alle domande più comuni
-              </p>
-            </div>
-            <div className="space-y-4">
-              {faq.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-purple-200/10 bg-purple-500/5 p-6 transition hover:bg-purple-500/10"
-                >
-                  <h3 className="text-lg font-medium mb-2 text-purple-100">
-                    {item.question}
-                  </h3>
-                  <p className="text-white/70 font-light text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Emergency Info */}
-          <section className="rounded-3xl border border-purple-200/10 bg-gradient-to-r from-purple-500/15 via-purple-900/20 to-sky-400/20 p-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl grayscale brightness-150">⚡</span>
-                <h3 className="text-2xl sm:text-3xl font-light tracking-wide text-white">
-                  Appuntamenti urgenti?
-                </h3>
               </div>
-              <p className="text-white/70 font-light max-w-2xl">
-                Se hai bisogno di un appuntamento urgente o dell'ultimo minuto,
-                contattaci direttamente su WhatsApp. Faremo del nostro meglio
-                per trovare una soluzione!
-              </p>
-              <div className="flex flex-wrap gap-4 pt-2">
+            </div>
+          </div>
+        </section>
+
+        {/* ─── FAQ ─── */}
+        <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+          <div className="mb-10">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
+              FAQ
+            </p>
+            <h2 className="text-3xl font-light tracking-wide text-neutral-900">
+              Domande frequenti
+            </h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {faq.map((item, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-neutral-200 bg-white p-6"
+              >
+                <h3 className="mb-2 font-medium text-neutral-900">{item.question}</h3>
+                <p className="text-sm text-neutral-500 font-light leading-relaxed">{item.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── SOCIAL + CTA ─── */}
+        <section className="border-t border-neutral-200 bg-neutral-50">
+          <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+            <div className="grid gap-8 lg:grid-cols-2 items-center">
+              <div>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
+                  Social
+                </p>
+                <h2 className="mb-6 text-2xl font-light text-neutral-900">
+                  Seguici sui social
+                </h2>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { name: "Instagram", handle: "@sultanyan__", href: "https://instagram.com/sultanyan__" },
+                    { name: "Facebook", handle: "Sultan Nails", href: "https://facebook.com/sultannails" },
+                    { name: "TikTok", handle: "@sultannails", href: "https://tiktok.com/@sultannails" },
+                  ].map((s) => (
+                    <a
+                      key={s.name}
+                      href={s.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-3.5 hover:border-neutral-400 hover:shadow-sm transition"
+                    >
+                      <span className="font-medium text-neutral-900">{s.name}</span>
+                      <span className="text-sm text-neutral-500 font-light">{s.handle}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-3xl bg-neutral-900 px-8 py-12 text-center text-white">
+                <h2 className="text-2xl font-light">Appuntamento urgente?</h2>
+                <p className="mt-3 text-neutral-400 font-light text-sm leading-relaxed">
+                  Scrivici direttamente su WhatsApp. Faremo del nostro meglio per trovare una soluzione!
+                </p>
                 <a
                   href="https://wa.me/393391862999"
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:-translate-y-1 transition-all"
+                  className="mt-6 inline-block rounded-full bg-white px-8 py-3 text-sm font-semibold text-neutral-900 hover:bg-neutral-100 transition"
                 >
-                  Contattaci su WhatsApp
-                </a>
-                <a
-                  href="tel:+393391862999"
-                  className="rounded-full border border-purple-200/30 bg-purple-500/10 px-8 py-4 text-base font-medium text-white transition hover:border-purple-200/50 hover:bg-purple-500/20"
-                >
-                  Chiamaci ora
+                  Scrivici su WhatsApp
                 </a>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Privacy Note */}
-          <section className="rounded-2xl border border-purple-200/10 bg-purple-500/5 p-6 text-center">
-            <p className="text-sm text-white/50 font-light">
-              🔒 La tua privacy è importante per noi. Tutti i dati personali
-              sono trattati secondo il GDPR e utilizzati esclusivamente per la
-              gestione degli appuntamenti.
-            </p>
-          </section>
+        {/* ─── PRIVACY NOTE ─── */}
+        <div className="border-t border-neutral-200 py-6 text-center">
+          <p className="text-xs text-neutral-400 font-light">
+            🔒 Dati personali trattati secondo il GDPR, utilizzati esclusivamente per la gestione degli appuntamenti.
+          </p>
         </div>
+
       </main>
     </>
   );

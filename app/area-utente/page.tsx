@@ -36,7 +36,6 @@ export default function AreaUtentePage() {
     notes: "",
   });
 
-  // Load User Data
   const loadData = async () => {
     try {
       const { user } = await userApi.getProfile();
@@ -48,17 +47,15 @@ export default function AreaUtentePage() {
   };
 
   useEffect(() => {
-    // Initial auth check
     const currentUser = authApi.getUser();
     if (!currentUser) {
       router.push("/login");
       return;
     }
-    setUser(currentUser); // Set initial state from local storage/auth
-    loadData(); // Fetch fresh profile
+    setUser(currentUser);
+    loadData();
   }, [router]);
 
-  // Load dependent data when user is ready
   useEffect(() => {
     if (user) {
       loadBookings();
@@ -140,7 +137,7 @@ export default function AreaUtentePage() {
       loadBookings();
       setDeleteModalOpen(false);
       setBookingToDelete(null);
-      setRefreshCalendar(prev => prev + 1); // Refresh calendar to show freed slot
+      setRefreshCalendar(prev => prev + 1);
     } catch (error: any) {
       alert(error.message || "Errore nella cancellazione");
     } finally {
@@ -150,8 +147,8 @@ export default function AreaUtentePage() {
 
   if (!user && loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="animate-spin rounded-none h-12 w-12 border-t-2 border-b-2 border-zinc-300"></div>
       </div>
     );
   }
@@ -159,44 +156,45 @@ export default function AreaUtentePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white/90 font-light">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(250,232,255,0.08),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(171,226,255,0.06),transparent_40%)]" />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-[#0f1018]/90 to-[#080810] -z-10" />
+    <div className="min-h-screen bg-[#030303] text-zinc-300 font-sans selection:bg-purple-900 selection:text-zinc-100">
+      {/* Background Metallic Elements */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-900/10 via-[#030303] to-[#030303]" />
+      <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay pointer-events-none" />
 
       {/* Top Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-black/50 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-[#050505]/80 backdrop-blur-md border-b border-zinc-800 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-8">
-              <span className="text-xl font-light tracking-widest bg-gradient-to-r from-purple-200 to-fuchsia-200 bg-clip-text text-transparent uppercase">
+              <span className="text-2xl font-black tracking-tighter bg-gradient-to-b from-zinc-100 via-zinc-400 to-zinc-800 bg-clip-text text-transparent uppercase drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">
                 Sultan Nails
               </span>
 
               {/* Desktop Tabs */}
-              <div className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+              <div className="hidden md:flex items-center gap-2 p-1">
                 <button
                   onClick={() => setActiveTab('dashboard')}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'dashboard'
-                    ? 'bg-purple-500/20 text-purple-100 shadow-sm shadow-purple-500/10 border border-purple-500/20'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                  className={`px-4 py-1.5 text-sm font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'dashboard'
+                    ? 'text-zinc-100 border-b-2 border-purple-500 bg-white/5 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]'
+                    : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                 >
                   Dashboard
                 </button>
                 <button
                   onClick={() => setActiveTab('calendar')}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'calendar'
-                    ? 'bg-purple-500/20 text-purple-100 shadow-sm shadow-purple-500/10 border border-purple-500/20'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                  className={`px-4 py-1.5 text-sm font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'calendar'
+                    ? 'text-zinc-100 border-b-2 border-purple-500 bg-white/5 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]'
+                    : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                 >
                   Prenota
                 </button>
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'profile'
-                    ? 'bg-purple-500/20 text-purple-100 shadow-sm shadow-purple-500/10 border border-purple-500/20'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                  className={`px-4 py-1.5 text-sm font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'profile'
+                    ? 'text-zinc-100 border-b-2 border-purple-500 bg-white/5 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]'
+                    : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                 >
                   Profilo
@@ -206,24 +204,27 @@ export default function AreaUtentePage() {
 
             <div className="flex items-center gap-4">
               <button
-                onClick={() => setViewMode('list')}
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 transition text-sm font-medium"
+                onClick={() => {
+                  setActiveTab('calendar');
+                  setViewMode('list');
+                }}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-zinc-100 transition-all bg-black/50 text-xs font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(255,255,255,0.05)]"
                 title="Le mie prenotazioni"
               >
-                <span>📋</span>
+                <span>[X]</span>
                 <span>Prenotazioni</span>
               </button>
               <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium text-white">{user.firstName} {user.lastName}</div>
-                <div className="text-xs text-white/40">{user.email}</div>
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-300">{user.firstName} {user.lastName}</div>
+                <div className="text-[10px] text-zinc-600 font-mono">{user.email}</div>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-xl bg-white/5 text-white/60 hover:bg-red-500/10 hover:text-red-400 transition-colors border border-transparent hover:border-red-500/20"
+                className="p-2 border border-transparent hover:border-red-500/50 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
                 title="Esci"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </button>
             </div>
@@ -232,86 +233,90 @@ export default function AreaUtentePage() {
       </nav>
 
       {/* Mobile Tab Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-xl border-t border-white/10 pb-safe">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#050505]/90 backdrop-blur-md border-t border-zinc-800 pb-safe">
         <div className="flex justify-around p-2">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex flex-col items-center gap-1 p-2 rounded-xl flex-1 ${activeTab === 'dashboard' ? 'text-purple-300' : 'text-white/40'
+            className={`flex flex-col items-center gap-1 p-2 flex-1 transition-colors ${activeTab === 'dashboard' ? 'text-zinc-100 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : 'text-zinc-600'
               }`}
           >
-            <span className="text-xl">🏠</span>
-            <span className="text-[10px] font-medium">Home</span>
+            <span className="text-xl">⬡</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Home</span>
           </button>
           <button
             onClick={() => setActiveTab('calendar')}
-            className={`flex flex-col items-center gap-1 p-2 rounded-xl flex-1 ${activeTab === 'calendar' ? 'text-purple-300' : 'text-white/40'
+            className={`flex flex-col items-center gap-1 p-2 flex-1 transition-colors ${activeTab === 'calendar' ? 'text-zinc-100 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : 'text-zinc-600'
               }`}
           >
-            <span className="text-xl">📅</span>
-            <span className="text-[10px] font-medium">Prenota</span>
+            <span className="text-xl">⬢</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Prenota</span>
           </button>
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1 p-2 rounded-xl flex-1 ${activeTab === 'profile' ? 'text-purple-300' : 'text-white/40'
+            className={`flex flex-col items-center gap-1 p-2 flex-1 transition-colors ${activeTab === 'profile' ? 'text-zinc-100 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : 'text-zinc-600'
               }`}
           >
-            <span className="text-xl">👤</span>
-            <span className="text-[10px] font-medium">Profilo</span>
+            <span className="text-xl">⎔</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Profilo</span>
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="pt-24 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className="pt-24 pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative z-10">
 
         {/* DASHBOARD TAB */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8 animate-fade-in relative">
             {/* Welcome Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-900/20 to-fuchsia-900/20 border border-white/5 p-8">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] rounded-full pointer-events-none" />
+            <div className="relative overflow-hidden bg-[#0a0a0a] border border-zinc-800/80 p-8 sm:p-12 shadow-[0_0_30px_rgba(0,0,0,0.8),inset_0_0_15px_rgba(255,255,255,0.02)] isolate">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none -z-10 mix-blend-screen" />
               <div className="relative z-10">
-                <h1 className="text-3xl sm:text-4xl font-light tracking-wide text-white mb-2">
-                  Ciao, <span className="font-medium text-purple-200">{user.firstName}</span>! 👋
-                </h1>
-                <p className="text-white/60 text-lg font-light">
-                  Benvenuto nella tua area personale.
+                <p className="text-zinc-500 text-xs font-bold uppercase tracking-[0.3em] mb-2 font-mono drop-shadow-md">
+                  // Area Personale
                 </p>
+                <h1 className="text-5xl sm:text-7xl font-black tracking-tighter uppercase leading-none bg-gradient-to-b from-white via-zinc-400 to-zinc-900 bg-clip-text text-transparent drop-shadow-[0_4px_10px_rgba(0,0,0,0.7)]" style={{ WebkitTextStroke: '0.5px rgba(255,255,255,0.1)' }}>
+                  Ciao,<br/>{user.firstName}
+                </h1>
               </div>
             </div>
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div
-                className="bg-purple-500/5 border border-purple-200/10 rounded-3xl p-6 backdrop-blur-sm hover:bg-purple-500/10 transition group cursor-pointer"
+                className="bg-[#0a0a0a] border border-zinc-800 p-6 sm:p-8 hover:border-purple-500/50 transition-all duration-300 group cursor-pointer shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] relative overflow-hidden"
                 onClick={() => setActiveTab('calendar')}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-white tracking-wide">Prossimo Appuntamento</h3>
-                  <span className="p-2 rounded-xl bg-purple-500/10 text-purple-300 group-hover:scale-110 transition disable-group-hover">📅</span>
-                </div>
-                {bookings.filter(b => b.status === 'confirmed').length > 0 ? (
-                  <p className="text-white/80 text-sm font-light">Hai {bookings.filter(b => b.status === 'confirmed').length} prenotazioni confermate.</p>
-                ) : (
-                  <p className="text-white/40 text-sm font-light">Nessun appuntamento in programma</p>
-                )}
-                <div className="mt-4 pt-4 border-t border-white/5">
-                  <span className="text-sm text-purple-300 font-medium group-hover:underline">+ Nuova Prenotazione</span>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-300">Prossimo App.to</h3>
+                    <span className="text-purple-400/50 group-hover:text-purple-400 transition-colors drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]">⬢</span>
+                  </div>
+                  {bookings.filter(b => b.status === 'confirmed').length > 0 ? (
+                    <p className="text-zinc-100 text-3xl font-black tracking-tighter bg-gradient-to-r from-zinc-200 to-zinc-600 bg-clip-text text-transparent">{bookings.filter(b => b.status === 'confirmed').length} ATTIVI</p>
+                  ) : (
+                    <p className="text-zinc-500 text-sm font-mono uppercase">Nessun appuntamento in programma</p>
+                  )}
+                  <div className="mt-8 pt-4 border-t border-zinc-800/50 flex justify-between items-center group-hover:border-purple-500/30 transition-colors">
+                    <span className="text-xs font-bold font-mono tracking-widest text-zinc-400 group-hover:text-purple-300 uppercase transition-colors">Nuova Prenotazione</span>
+                    <span className="text-zinc-600 transition-transform group-hover:translate-x-1 group-hover:text-purple-300">→</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-purple-500/5 border border-purple-200/10 rounded-3xl p-6 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-white tracking-wide">Stato Account</h3>
-                  <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">✓</span>
+              <div className="bg-[#0a0a0a] border border-zinc-800 p-6 sm:p-8 shadow-[0_0_15px_rgba(0,0,0,0.5)] relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-300">Stato Account</h3>
+                  <span className="text-emerald-500/50 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">●</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-fuchsia-400 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/20">
+                <div className="flex items-center gap-5">
+                  <div className="h-16 w-16 border border-zinc-700 bg-gradient-to-br from-zinc-800 to-black flex items-center justify-center text-zinc-300 font-black text-2xl shadow-[inset_0_0_10px_rgba(255,255,255,0.05)]">
                     {(user.firstName || '?').charAt(0)}{(user.lastName || '?').charAt(0)}
                   </div>
                   <div>
-                    <div className="text-white font-medium">Membro Attivo</div>
-                    <div className="text-white/40 text-xs font-light">Iscritto dal {new Date(user.createdAt || Date.now()).toLocaleDateString()}</div>
+                    <div className="text-zinc-100 font-bold uppercase tracking-widest text-sm bg-gradient-to-r from-emerald-100 to-emerald-600 bg-clip-text text-transparent">Membro Attivo</div>
+                    <div className="text-zinc-500 text-xs font-mono tracking-widest mt-1">ID: {user.id} // DAL {new Date(user.createdAt || Date.now()).getFullYear()}</div>
                   </div>
                 </div>
               </div>
@@ -321,82 +326,22 @@ export default function AreaUtentePage() {
 
         {/* CALENDAR TAB */}
         {activeTab === 'calendar' && (
-          <div className="animate-fade-in">
-            {/* Booking Form Overlay */}
-            {showBookingForm && (
-              <div className="mb-8 rounded-3xl border border-purple-200/10 bg-purple-500/5 p-8 backdrop-blur-xl">
-                <h2 className="mb-6 text-2xl font-light tracking-wide text-white">Nuova Prenotazione</h2>
-                <form onSubmit={handleBookingSubmit} className="space-y-6">
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div>
-                      <ServiceSelector
-                        services={services}
-                        selectedId={bookingForm.serviceId}
-                        onSelect={(id) => setBookingForm({ ...bookingForm, serviceId: id })}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-purple-200/80">
-                        Data e Ora *
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={bookingForm.bookingDate}
-                        onChange={(e) => setBookingForm({ ...bookingForm, bookingDate: e.target.value })}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-1 focus:ring-purple-400/20 font-light"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-purple-200/80">
-                      Note
-                    </label>
-                    <textarea
-                      value={bookingForm.notes}
-                      onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })}
-                      rows={3}
-                      className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/30 focus:border-purple-400/50 focus:outline-none focus:ring-1 focus:ring-purple-400/20 font-light"
-                      placeholder="Note aggiuntive..."
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isBooking}
-                    className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-400 to-fuchsia-500 px-6 py-3 font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
-                  >
-                    {isBooking ? (
-                      <>
-                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Processing...
-                      </>
-                    ) : (
-                      "Crea Prenotazione"
-                    )}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* View Toggle */}
-            <div className="mb-6 flex gap-4 border-b border-white/10">
+          <div className="animate-fade-in relative z-10 w-full h-full min-h-[500px]">
+             {/* View Toggle */}
+             <div className="mb-6 flex gap-4 border-b border-zinc-800">
               <button
                 onClick={() => setViewMode('calendar')}
-                className={`pb-4 px-4 font-medium transition ${viewMode === 'calendar' ? 'border-b border-purple-400 text-purple-300' : 'text-white/60 hover:text-white'}`}
+                className={`pb-4 px-4 text-xs font-bold uppercase tracking-widest transition-all ${viewMode === 'calendar' ? 'border-b-2 border-purple-500 text-zinc-100 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]' : 'text-zinc-500 hover:text-zinc-300'}`}
               >
-                📅 Calendario
+                Calendario
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`pb-4 px-4 font-medium transition ${viewMode === 'list' ? 'border-b border-purple-400 text-purple-300' : 'text-white/60 hover:text-white'}`}
+                className={`pb-4 px-4 text-xs font-bold uppercase tracking-widest transition-all ${viewMode === 'list' ? 'border-b-2 border-purple-500 text-zinc-100 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]' : 'text-zinc-500 hover:text-zinc-300'}`}
               >
-                📋 Le mie prenotazioni
+                Lista Dettagli
               </button>
             </div>
-
             {viewMode === 'calendar' ? (
               <UserBookingCalendar
                 refreshTrigger={refreshCalendar}
@@ -408,57 +353,53 @@ export default function AreaUtentePage() {
                 }}
               />
             ) : (
-              <div className="rounded-3xl border border-purple-200/10 bg-purple-500/5 p-8 backdrop-blur-sm">
-                <h2 className="mb-6 text-2xl font-light tracking-wide text-white">Le tue prenotazioni</h2>
+                <div className="border border-zinc-800 bg-[#0a0a0a] p-8 shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+                <h2 className="mb-8 text-sm font-bold uppercase tracking-[0.2em] text-zinc-400">Archivio Prenotazioni</h2>
 
                 {bookings.length === 0 ? (
-                  <div className="text-center text-white/50 font-light italic">
-                    Nessuna prenotazione attiva.
+                  <div className="text-center text-zinc-600 font-mono text-xs uppercase tracking-widest py-10">
+                    // Nessun record trovato //
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {bookings.map((booking) => (
                       <div
                         key={booking.id}
-                        className="rounded-2xl border border-white/5 bg-black/20 p-6 transition hover:bg-black/30"
+                        className="border border-zinc-800/50 bg-[#080808] p-6 transition-all hover:border-zinc-600"
                       >
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex-1">
-                            <div className="mb-2 flex items-center gap-3">
-                              <h3 className="text-xl font-medium text-white">{booking.serviceName}</h3>
+                            <div className="mb-3 flex items-center gap-3">
+                              <h3 className="text-lg font-black uppercase tracking-tight text-zinc-200">{booking.serviceName}</h3>
                               <span
-                                className={`rounded-full px-3 py-1 text-xs font-semibold ${booking.status === 'confirmed'
-                                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                                className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest border ${booking.status === 'confirmed'
+                                  ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/5'
                                   : booking.status === 'completed'
-                                    ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20'
+                                    ? 'border-blue-500/30 text-blue-400 bg-blue-500/5'
                                     : booking.status === 'cancelled'
-                                      ? 'bg-red-500/10 text-red-300 border border-red-500/20'
-                                      : 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20'
+                                      ? 'border-red-500/30 text-red-400 bg-red-500/5'
+                                      : 'border-yellow-500/30 text-yellow-400 bg-yellow-500/5'
                                   }`}
                               >
-                                {booking.status === 'pending' && 'In attesa'}
-                                {booking.status === 'confirmed' && 'Confermata'}
-                                {booking.status === 'completed' && 'Completata'}
-                                {booking.status === 'cancelled' && 'Cancellata'}
+                                {booking.status}
                               </span>
                             </div>
-                            <div className="space-y-1 text-sm text-white/60 font-light">
+                            <div className="space-y-1 text-xs font-mono text-zinc-500 uppercase">
                               <div>
-                                📅 {new Date(booking.bookingDate).toLocaleString('it-IT')}
+                                {new Date(booking.bookingDate).toLocaleString('it-IT')}
                               </div>
                               {booking.servicePrice && (
-                                <div>💶 €{booking.servicePrice}</div>
+                                <div>€{booking.servicePrice} // {booking.durationMinutes} MIN</div>
                               )}
-                              <div>⏱️ {booking.durationMinutes} minuti</div>
-                              {booking.notes && <div>📝 {booking.notes}</div>}
+                              {booking.notes && <div className="text-zinc-600">[{booking.notes}]</div>}
                             </div>
                           </div>
                           {booking.status === 'pending' && (
                             <button
                               onClick={() => handleOpenDeleteModal(booking.id)}
-                              className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/20"
+                              className="border border-red-900 bg-black px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-500 transition hover:bg-red-900/20"
                             >
-                              Cancella
+                              Annulla
                             </button>
                           )}
                         </div>
@@ -468,16 +409,14 @@ export default function AreaUtentePage() {
                 )}
               </div>
             )}
-          </div>
+           </div>
         )}
-
-        {/* PROFILE TAB */}
         {activeTab === 'profile' && (
-          <UserProfile userData={user} onUpdate={loadData} />
+             <div className="border border-zinc-800 bg-[#0a0a0a] p-8 shadow-[0_0_20px_rgba(0,0,0,0.8)] text-zinc-300">
+                <UserProfile userData={user} onUpdate={loadData} />
+             </div>
         )}
-
       </main>
-
 
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}
@@ -485,6 +424,6 @@ export default function AreaUtentePage() {
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}
       />
-    </div >
+    </div>
   );
 }

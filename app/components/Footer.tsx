@@ -1,81 +1,61 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-const Footer = () => {
-    const pathname = usePathname();
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/servizi" },
+  { label: "Palette", href: "/palette" },
+  { label: "Contact", href: "/contatti" },
+];
 
-    // Nascondi il footer nelle pagine di login e register
-    if (pathname === '/login' || pathname === '/register') {
-        return null;
-    }
+export default function Footer() {
+  const pathname = usePathname();
 
-    return (
-        <footer className="bg-transparent py-12 mt-20">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
+  if (pathname === "/login" || pathname === "/register") {
+    return null;
+  }
 
-                {/* Logo & Brand */}
-                <div className="flex flex-col items-start gap-4">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-foreground/10">
-                        <Image
-                            src="/sultannailslogo.jpg"
-                            alt="Sultan Nails Logo"
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
-                    <p className="text-foreground/80 text-sm leading-relaxed">
-                        Esaltiamo la tua bellezza con trattamenti unici e personalizzati.
-                        Il tuo benessere è la nostra priorità.
-                    </p>
-                </div>
-
-                {/* Link Rapidi */}
-                <div>
-                    <h3 className="text-foreground font-semibold mb-4">Esplora</h3>
-                    <ul className="space-y-3 text-foreground/70 text-sm">
-                        <li><Link href="/" className="hover:text-foreground transition">Home</Link></li>
-                        <li><Link href="/servizi" className="hover:text-foreground transition">Servizi</Link></li>
-                        <li><Link href="/pacchetti" className="hover:text-foreground transition">Pacchetti</Link></li>
-                        <li><Link href="/contatti" className="hover:text-foreground transition">Contatti</Link></li>
-                    </ul>
-                </div>
-
-                {/* Contatti */}
-                <div>
-                    <h3 className="text-foreground font-semibold mb-4">Contatti</h3>
-                    <ul className="space-y-3 text-foreground/70 text-sm">
-                        <li>📍 Casalnuovo di Napoli, Via Corso Umberto I n 52</li>
-                        <li>📞 <a href="tel:+393391862999" className="hover:text-foreground">339 186 2999</a></li>
-                        <li>✉️ <a href="mailto:sultan.nails.store@gmail.com" className="hover:text-foreground">sultan.nails.store@gmail.com</a></li>
-                        <li>⏰ Lun - Ven: 09:00 - 19:00</li>
-                    </ul>
-                </div>
-
-                {/* Social & Legal */}
-                <div>
-                    <h3 className="text-foreground font-semibold mb-4">Seguici</h3>
-                    <div className="flex gap-4 mb-6">
-                        <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-foreground/5 text-foreground hover:bg-foreground hover:text-background transition">
-                            📷
-                        </a>
-                        <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-foreground/5 text-foreground hover:bg-foreground hover:text-background transition">
-                            📘
-                        </a>
-                        <a href="#" className="w-8 h-8 flex items-center justify-center rounded-full bg-foreground/5 text-foreground hover:bg-foreground hover:text-background transition">
-                            🎵
-                        </a>
-                    </div>
-                    <p className="text-xs text-foreground/50">
-                        © {new Date().getFullYear()} Sultan Nails. <br />Tutti i diritti riservati.
-                    </p>
-                </div>
-
+  return (
+    <footer className="relative z-10 mt-10 px-6 pb-10 sm:px-10">
+      <div className="mx-auto max-w-7xl border-t border-white/30 pt-8">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-lg">
+            <div className="mb-3 font-hud text-sm uppercase tracking-[0.24em] text-[#ff7cc9]">
+              ending screen
             </div>
-        </footer>
-    );
-};
 
-export default Footer;
+            <p className="font-hud text-sm uppercase leading-7 tracking-[0.16em] text-[#ffc7e6]">
+              Pop poster layouts, glossy buttons, reaction tags and chrome-fueled
+              nail moods from Napoli.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {links.map((link, index) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`inline-flex min-h-11 items-center rounded-full px-5 py-3 font-hud text-sm uppercase tracking-[0.14em] transition-transform duration-200 hover:-translate-y-0.5 ${
+                  index % 2 === 0
+                    ? "border border-[#ffd3ea] bg-white/90 text-[#ff4fb3] shadow-[inset_0_2px_0_rgba(255,255,255,0.9),0_10px_24px_rgba(0,0,0,0.2)]"
+                    : "border border-[#ffb3da] bg-[#ff7cc9] text-[#5b1038] shadow-[inset_0_2px_0_rgba(255,255,255,0.35),0_10px_24px_rgba(0,0,0,0.18)]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 flex flex-col gap-3 font-hud text-xs uppercase tracking-[0.16em] text-[#ffd8ec] sm:flex-row sm:items-center sm:justify-between">
+          <span>{`(c) ${new Date().getFullYear()} Sultan Nails`}</span>
+          <span className="text-[#ff7cc9]">
+            instant message aesthetic / playable poster / all rights reserved
+          </span>
+        </div>
+      </div>
+    </footer>
+  );
+}
