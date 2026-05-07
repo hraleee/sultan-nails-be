@@ -72,7 +72,7 @@ export default function Header() {
               <Link href="/" className="mx-4 shrink-0 flex items-center justify-center">
                 <img
                   src="/laura_fluxx.png"
-                  alt="Pucci Nails Store"
+                  alt="L'aura Flux"
                   className="h-auto w-32 sm:w-44 lg:w-56 object-contain" 
                   style={{ maxHeight: '85px' }} 
                 />
@@ -115,7 +115,7 @@ export default function Header() {
       >
         <div className="flex flex-col h-full pt-16">
           <div className="mb-14">
-            <img src="/PucciNailsStoreLogo2.png" alt="Logo" className="w-40 h-auto" />
+            <img src="/laura_fluxx.png" alt="Logo" className="w-40 h-auto" />
           </div>
 
           <nav className="flex flex-col gap-6">
