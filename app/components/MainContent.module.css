@@ -1,3 +1,11 @@
+.videoLoader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 3, 3, 0.88);
+}
 .page {
   position: relative;
   overflow: hidden;
@@ -19,10 +27,7 @@
 .background {
   overflow: hidden;
   opacity: 1;
-  background-image: url("/hellobg.jpg");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  background: #030303;
 }
 
 .background::after {
@@ -759,4 +764,97 @@
     width: 62px;
     height: 62px;
   }
+ .videoLoader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top left, rgba(255, 80, 180, 0.18), transparent 24%),
+    radial-gradient(circle at top right, rgba(150, 220, 255, 0.14), transparent 20%),
+    rgba(3, 3, 3, 0.88);
+  backdrop-filter: blur(10px);
+}
+
+.loaderWindow {
+  position: relative;
+  z-index: 10000;
+  width: min(92vw, 420px);
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #5f5f5f;
+  border-bottom: 2px solid #5f5f5f;
+  background: #c9c9c9;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.24);
+}
+
+.loaderTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 8px;
+  background: linear-gradient(90deg, #0817a3 0%, #1736d0 70%, #4f75ff 100%);
+  color: #fff;
+  font-family: var(--font-hud);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.loaderDots {
+  letter-spacing: 0.1em;
+}
+
+.loaderBody {
+  padding: 18px 16px 16px;
+}
+
+.loaderTitle {
+  color: #1d1d1d;
+  font-family: var(--font-poster);
+  font-size: 1.35rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.loaderBar {
+  position: relative;
+  height: 22px;
+  margin-top: 16px;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #787878;
+  border-bottom: 2px solid #787878;
+  background: #efeff4;
+  overflow: hidden;
+}
+
+.loaderBarFill {
+  width: 42%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff7cc9 0%, #ff4fb3 45%, #d9ff72 100%);
+  animation: loader-progress 1.4s ease-in-out infinite alternate;
+}
+
+.loaderMeta {
+  margin-top: 12px;
+  color: #4b4b58;
+  font-family: var(--font-hud);
+  font-size: 10px;
+  line-height: 1.7;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@keyframes loader-progress {
+  0% {
+    width: 18%;
+  }
+  100% {
+    width: 88%;
+  }
+}
 }

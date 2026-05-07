@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import styles from "./MainContent.module.css";
+import { useState } from "react";
 
 const chatLines = [
   { from: "stylist.exe", text: "hot pink chrome? say less.", side: "left" },
@@ -34,22 +37,47 @@ const stickerTags = [
 ];
 
 export default function MainContent() {
+  const [isVideoReady, setIsVideoReady] = useState(false);
   return (
-    <main className={styles.page}>
-      <div className={styles.background}>
-        <video
-          className={styles.backgroundVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        >
-          <source src="/bgvideoY2K.mp4" type="video/mp4" />
-        </video>
-      </div>
-      <div className={styles.grain} />
+   <main className={styles.page}>
+  {!isVideoReady && (
+    <div className={styles.videoLoader}>
+      <div className={styles.loaderWindow}>
+        <div className={styles.loaderTopBar}>
+          <span>booting_l'aura_flux.exe</span>
+          <span className={styles.loaderDots}>•••</span>
+        </div>
 
+        <div className={styles.loaderBody}>
+          <div className={styles.loaderTitle}>loading cyber-pop world</div>
+          <div className={styles.loaderBar}>
+            <div className={styles.loaderBarFill} />
+          </div>
+          <div className={styles.loaderMeta}>
+            please wait / glossy assets / video sync
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <div className={styles.background}>
+<video
+  className={styles.backgroundVideo}
+  autoPlay
+  muted
+  loop
+  playsInline
+  preload="metadata"
+  onLoadedData={() => setIsVideoReady(true)}
+  onCanPlayThrough={() => setIsVideoReady(true)}
+  onError={() => setIsVideoReady(true)}
+>
+  <source src="/bgvideoY2K.mp4" type="video/mp4" />
+</video>
+  </div>
+
+  <div className={styles.grain} />
       <section className={styles.heroSection}>
         <div className={styles.heroGrid}>
           <div className={styles.heroCopy}>
@@ -91,7 +119,7 @@ export default function MainContent() {
           <div className={styles.heroVisual}>
             <div className={styles.posterFrame}>
               <div className={styles.posterTopBar}>
-                <div className={styles.titleBarText}>SultanNails.exe</div>
+                <div className={styles.titleBarText}>L'aura_Flux.exe</div>
                 <div className={styles.titleBarControls}>
                   <span className={styles.titleButton} />
                   <span className={styles.titleButton} />
@@ -129,7 +157,7 @@ export default function MainContent() {
 
                   <div className={styles.miniProfile}>
                     <div className={styles.panelLabel}>status</div>
-                    <div className={styles.profileName}>Sultan online</div>
+                    <div className={styles.profileName}>L'aura Flux online</div>
                     <div className={styles.profileMeta}>Napoli / chrome crush / booking open</div>
                   </div>
                 </div>

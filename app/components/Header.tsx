@@ -12,132 +12,139 @@ const navLinks = [
 
 export default function Header() {
   const [visible, setVisible] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
     const onScroll = () => {
       const currentY = window.scrollY;
-      setScrolled(currentY > 12);
-
-      if (currentY <= 12) {
-        setVisible(true);
-      } else if (currentY > lastScrollY.current + 6) {
+      if (currentY > lastScrollY.current && currentY > 100) {
         setVisible(false);
-      } else if (currentY < lastScrollY.current - 6) {
+      } else {
         setVisible(true);
       }
-
       lastScrollY.current = currentY;
     };
-
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    if (!visible) setOpen(false);
-  }, [visible]);
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [isOpen]);
 
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-[999] px-4 pt-4 transition-transform duration-300 sm:px-6 lg:px-8 ${
-          visible ? "translate-y-0" : "-translate-y-[140%]"
+        className={`fixed left-0 right-0 top-0 z-[999] bg-white border-b border-gray-100 transition-transform duration-300 ${
+          visible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div
-          className={`mx-auto max-w-[1480px] rounded-[14px] border transition-all duration-300 ${
-            scrolled
-              ? "border-white/25 bg-[linear-gradient(90deg,rgba(11,11,16,0.88),rgba(26,26,38,0.88),rgba(20,27,38,0.88))] shadow-[0_18px_40px_rgba(0,0,0,0.34)] backdrop-blur-md"
-              : "border-white/20 bg-[linear-gradient(90deg,rgba(14,14,18,0.72),rgba(28,26,36,0.72),rgba(17,24,34,0.7))] shadow-[0_14px_30px_rgba(0,0,0,0.24)] backdrop-blur-[6px]"
-          }`}
-        >
-          <div className="relative flex items-center justify-between gap-4 rounded-[14px] border-t border-l border-white/20 border-r border-b border-r-black/35 border-b-black/35 px-4 py-3 sm:px-6">
-            <div className="hidden flex-1 items-center gap-3 md:flex">
-              {navLinks.slice(0, 2).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="inline-flex min-h-[40px] items-center rounded-[10px] border border-white/15 bg-white/5 px-4 font-hud text-[10px] uppercase tracking-[0.18em] text-white/72 transition-colors hover:bg-white/10 hover:text-[#ff53b6]"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
-            <button
-              className="absolute left-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-[10px] border border-white/15 bg-white/5 text-white/80 transition-colors hover:text-[#ff53b6] md:hidden"
-              onClick={() => setOpen((value) => !value)}
-              aria-label="Apri menu"
+        <div className="mx-auto flex h-24 lg:h-28 max-w-[1920px] items-center justify-between px-6 sm:px-10">
+          
+          {/* Hamburger Mobile */}
+          <div className="flex items-center justify-start md:hidden">
+            <button 
+              className="group flex flex-col gap-[5px] z-[1001] relative" 
+              onClick={() => setIsOpen(!isOpen)}
             >
-              <span className="flex flex-col gap-[5px]">
-                <span className={`block h-[1.5px] bg-current transition-all duration-300 ${open ? "w-5 translate-y-[6.5px] rotate-45" : "w-5"}`} />
-                <span className={`block h-[1.5px] bg-current transition-all duration-300 ${open ? "opacity-0" : "w-4"}`} />
-                <span className={`block h-[1.5px] bg-current transition-all duration-300 ${open ? "w-5 -translate-y-[6.5px] -rotate-45" : "w-5"}`} />
-              </span>
+              <span className={`h-[2px] w-7 bg-black transition-all duration-300 ${isOpen ? "rotate-45 translate-y-[7px]" : ""}`}></span>
+              <span className={`h-[2px] w-7 bg-black transition-all duration-300 ${isOpen ? "opacity-0" : ""}`}></span>
+              <span className={`h-[2px] w-7 bg-black transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-[7px]" : ""}`}></span>
             </button>
+          </div>
 
-            <div className="flex flex-1 justify-center md:flex-none">
-              <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+          {/* Navigazione Centrale (Logo + Link PC) */}
+          <div className="flex flex-1 items-center justify-center">
+            <div className="flex items-center justify-center w-full gap-4 md:gap-8 lg:gap-12">
+              <nav className="hidden items-center gap-10 md:flex lg:gap-16">
+                {navLinks.slice(0, 2).map((link) => (
+                  <Link key={link.href} href={link.href} className="text-[13px] font-black uppercase tracking-tighter text-black transition-opacity hover:opacity-50">
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+
+              <Link href="/" className="mx-4 shrink-0 flex items-center justify-center">
                 <img
-                  src="/logo-header.png"
-                  alt="Sultan Nails"
-                  className="h-auto w-36 object-contain sm:w-40 md:w-44"
+                  src="/laura_fluxx.png"
+                  alt="Pucci Nails Store"
+                  className="h-auto w-32 sm:w-44 lg:w-56 object-contain" 
+                  style={{ maxHeight: '85px' }} 
                 />
               </Link>
-            </div>
 
-            <div className="hidden flex-1 items-center justify-end gap-3 md:flex">
-              {navLinks.slice(2).map((link, index) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`inline-flex min-h-[40px] items-center rounded-[10px] border px-4 font-hud text-[10px] uppercase tracking-[0.18em] transition-colors ${
-                    index === 1
-                      ? "border-[#ff53b6]/35 bg-[#ff53b6]/12 text-[#ff87cd] hover:bg-[#ff53b6]/18"
-                      : "border-white/15 bg-white/5 text-white/72 hover:bg-white/10 hover:text-[#ff53b6]"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <nav className="hidden items-center gap-10 md:flex lg:gap-16">
+                {navLinks.slice(2).map((link) => (
+                  <Link key={link.href} href={link.href} className="text-[13px] font-black uppercase tracking-tighter text-black transition-opacity hover:opacity-50">
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
             </div>
+          </div>
 
+          {/* Lente Mobile */}
+          <div className="flex items-center justify-end md:hidden">
+            <button aria-label="Search" className="text-black">
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2.5" fill="none">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
-      {open && (
-        <div className="fixed inset-0 z-[998] bg-black/35 backdrop-blur-[2px] md:hidden" onClick={() => setOpen(false)}>
-          <div
-            className="absolute left-4 right-4 top-[88px] rounded-[16px] border border-white/15 bg-[linear-gradient(180deg,rgba(16,16,22,0.96),rgba(25,24,36,0.96))] p-4 shadow-[0_22px_40px_rgba(0,0,0,0.35)]"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="mb-3 font-hud text-[9px] uppercase tracking-[0.22em] text-white/45">
-              navigation
-            </div>
-            <div className="flex flex-col gap-3">
-              {navLinks.map((link, index) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={`inline-flex min-h-[44px] items-center rounded-[10px] border px-4 font-hud text-[10px] uppercase tracking-[0.18em] ${
-                    index === 3
-                      ? "border-[#ff53b6]/35 bg-[#ff53b6]/12 text-[#ff87cd]"
-                      : "border-white/12 bg-white/5 text-white/78"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+      {/* --- SIDEBAR MOBILE --- */}
+      <div 
+        className={`fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm transition-opacity duration-500 md:hidden ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={() => setIsOpen(false)}
+      />
+
+      <aside 
+        className={`fixed top-0 left-0 z-[1000] h-full w-[85%] max-w-[320px] bg-white p-10 shadow-2xl transition-transform duration-500 ease-out md:hidden ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full pt-16">
+          <div className="mb-14">
+            <img src="/PucciNailsStoreLogo2.png" alt="Logo" className="w-40 h-auto" />
+          </div>
+
+          <nav className="flex flex-col gap-6">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                /* 
+                   HOVER SIDEBAR: 
+                   - Opacity 50% al passaggio (come nell'header)
+                   - Leggero spostamento a destra (translate-x-2) per dinamismo
+                */
+                className="text-3xl font-black uppercase tracking-tighter text-black transition-all duration-300 hover:opacity-50 hover:translate-x-2"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="mt-auto border-t border-gray-100 pt-8 pb-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">Follow us</p>
+            <div className="flex gap-6 font-black uppercase text-[11px] tracking-tighter">
+              <a href="#" className="hover:opacity-50 transition-opacity">Instagram</a>
+              <a href="#" className="hover:opacity-50 transition-opacity">TikTok</a>
             </div>
           </div>
         </div>
-      )}
+      </aside>
     </>
   );
 }
