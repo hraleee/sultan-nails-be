@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const navLinks = [
+  { label: "Home", href: "/" },
   { label: "Services", href: "/servizi" },
   { label: "Palette", href: "/palette" },
   { label: "Packages", href: "/pacchetti" },
@@ -113,10 +114,10 @@ export default function Header() {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full pt-16">
-          <div className="mb-14">
-            <img src="/laura_fluxx.png" alt="Logo" className="w-40 h-auto" />
-          </div>
+        <div className="flex flex-col h-full pt-6">
+  <div className="mb-10">
+    <img src="/laura_fluxx.png" alt="Logo" className="w-40 h-auto" />
+  </div>
 
           <nav className="flex flex-col gap-6">
             {navLinks.map((link) => (
@@ -137,11 +138,47 @@ export default function Header() {
           </nav>
 
           <div className="mt-auto border-t border-gray-100 pt-8 pb-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">Follow us</p>
-            <div className="flex gap-6 font-black uppercase text-[11px] tracking-tighter">
-              <a href="#" className="hover:opacity-50 transition-opacity">Instagram</a>
-              <a href="#" className="hover:opacity-50 transition-opacity">TikTok</a>
-            </div>
+
+  {/* Login button */}
+  <Link
+    href="/login"
+    onClick={() => setIsOpen(false)}
+    className="inline-flex items-center gap-2 mb-6 text-[11px] font-bold uppercase tracking-[0.18em] text-black hover:opacity-50 transition-opacity"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+    Login
+  </Link>
+
+  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">Follow us</p>
+           <div className="flex gap-6 font-black uppercase text-[11px] tracking-tighter">
+  <a
+    href="https://www.instagram.com/sultannails_/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:opacity-50 transition-opacity"
+  >
+    Instagram
+  </a>
+  <a
+    href="https://www.tiktok.com/@sultannails_"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:opacity-50 transition-opacity"
+  >
+    TikTok
+  </a>
+</div>
           </div>
         </div>
       </aside>
