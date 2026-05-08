@@ -7,8 +7,7 @@ const packages = [
     tagline: "Veloce e impeccabile",
     price: "45€",
     duration: "45 min",
-    description:
-      "Perfetto per chi ha poco tempo ma vuole un risultato impeccabile",
+    description: "Perfetto per chi ha poco tempo ma vuole un risultato impeccabile",
     includes: [
       "Shape e limatura professionale",
       "Pulizia cuticole delicata",
@@ -142,105 +141,152 @@ export default function PacchettiPage() {
   return (
     <>
       <Header />
-      <main className="text-neutral-900" style={{ paddingTop: 68 }}>
 
-        {/* ─── HERO ─────────────────────────────────────────── */}
-        <section className="border-b border-neutral-200 bg-neutral-50 px-6 py-20 sm:px-10 lg:px-14">
+      {/* Background video */}
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover opacity-60"
+        >
+          <source src="/bgvideoY2K.webm" type="video/webm" />
+          <source src="/bgvideoY2K.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      {/* Grain */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 opacity-[0.035]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <main className="text-white" style={{ paddingTop: 68 }}>
+
+        {/* ─── HERO ─── */}
+        <section className="border-b border-white/10 px-6 pb-12 pt-16 sm:px-10 lg:px-14">
           <div className="mx-auto max-w-6xl">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
-              Pacchetti &amp; Abbonamenti
+            <p className="mb-3 font-hud text-[10px] uppercase tracking-[0.35em] text-[#ff7cc9]">
+              pacchetti.exe
             </p>
-            <h1 className="max-w-3xl text-4xl font-light leading-tight tracking-tight text-neutral-900 sm:text-5xl">
-              Scegli il pacchetto{" "}
-              <span className="italic font-extralight">perfetto per te</span>
+            <h1 className="font-poster text-5xl uppercase tracking-tight text-white sm:text-6xl">
+              Scegli il tuo<br />pacchetto
             </h1>
-            <p className="mt-6 max-w-2xl text-base text-neutral-500 font-light leading-relaxed">
-              Dai trattamenti express alle esperienze luxury complete. Ogni
-              pacchetto è studiato per offrirti il massimo valore e qualità.
+            <p className="mt-4 max-w-2xl font-hud text-[11px] uppercase leading-7 tracking-[0.16em] text-white/70">
+              Dai trattamenti express alle esperienze luxury complete. Ogni pacchetto è studiato
+              per offrirti il massimo valore e qualità.
             </p>
           </div>
         </section>
 
-        {/* ─── PACKAGES GRID ─────────────────────────────────── */}
-        <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10 lg:px-14">
+        {/* ─── PACKAGES GRID ─── */}
+        <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
           <div className="grid gap-6 lg:grid-cols-2">
             {packages.map((pkg) => (
               <article
                 key={pkg.name}
-                className="group flex flex-col rounded-2xl border border-neutral-200 bg-white p-8 transition hover:border-neutral-400 hover:shadow-lg"
+                className="flex flex-col border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] shadow-[6px_6px_0_rgba(0,0,0,0.3)]"
               >
-                {/* Badge */}
-                <span className="mb-4 inline-block rounded-full border border-neutral-200 px-3 py-1 text-xs font-medium uppercase tracking-wider text-neutral-500 w-fit">
-                  {pkg.badge}
-                </span>
+                {/* Title bar */}
+                <div className="flex items-center justify-between bg-gradient-to-r from-[#0817a3] via-[#1736d0] to-[#4f75ff] px-2 py-1.5">
+                  <span className="font-hud text-[9px] uppercase tracking-[0.2em] text-white">
+                    {pkg.name}.exe
+                  </span>
+                  <div className="flex gap-1">
+                    <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                    <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                    <span className="flex h-3 w-3 items-center justify-center border border-white/40 bg-[#c9c9c9] font-hud text-[7px] text-black">x</span>
+                  </div>
+                </div>
 
-                {/* Header */}
-                <div className="mb-4">
-                  <h2 className="text-2xl font-light tracking-wide text-neutral-900">
-                    {pkg.name}
-                  </h2>
-                  <p className="mt-1 text-sm text-neutral-400 font-light">
-                    {pkg.tagline}
+                {/* Menu strip */}
+                <div className="flex gap-4 border-b border-white/30 bg-[#c9c9c9] px-3 py-1">
+                  {["File", "Edit", "View", "Help"].map((m) => (
+                    <span key={m} className="font-hud text-[8px] uppercase tracking-wider text-[#1a1a1a]">{m}</span>
+                  ))}
+                </div>
+
+                {/* Body */}
+                <div className="flex flex-1 flex-col p-6">
+                  {/* Badge */}
+                  <span className="mb-4 w-fit border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] px-3 py-1 font-hud text-[8px] uppercase tracking-[0.2em] text-white">
+                    {pkg.badge}
+                  </span>
+
+                  {/* Header */}
+                  <div className="mb-4">
+                    <h2 className="font-poster text-2xl uppercase tracking-tight text-[#1a1a1a]">
+                      {pkg.name}
+                    </h2>
+                    <p className="mt-1 font-hud text-[9px] uppercase tracking-[0.14em] text-[#0817a3]">
+                      {pkg.tagline}
+                    </p>
+                  </div>
+
+                  {/* Price & Duration */}
+                  <div className="mb-5 flex items-baseline gap-3 border-b border-white/50 pb-5">
+                    <span className="font-poster text-3xl text-[#1a1a1a]">{pkg.price}</span>
+                    <span className="font-hud text-[9px] uppercase tracking-[0.14em] text-[#555]">{pkg.duration}</span>
+                  </div>
+
+                  {/* Description */}
+                  <p className="mb-5 font-hud text-[9px] uppercase leading-6 tracking-[0.12em] text-[#444]">
+                    {pkg.description}
                   </p>
+
+                  {/* Includes */}
+                  <div className="mb-5 flex-1">
+                    <p className="mb-3 font-hud text-[8px] uppercase tracking-[0.28em] text-[#0817a3]">
+                      Include
+                    </p>
+                    <ul className="space-y-2">
+                      {pkg.includes.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3 font-hud text-[9px] uppercase leading-5 tracking-[0.1em] text-[#333]">
+                          <span className="mt-2 h-px w-3 shrink-0 bg-[#ff4fb3]" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Ideal For */}
+                  <div className="mb-5 border border-white/50 bg-white/30 px-4 py-3">
+                    <p className="font-hud text-[8px] uppercase tracking-[0.24em] text-[#0817a3]">
+                      Ideale per
+                    </p>
+                    <p className="mt-1 font-hud text-[9px] uppercase tracking-[0.1em] text-[#333]">
+                      {pkg.ideal}
+                    </p>
+                  </div>
+
+                  {/* CTA */}
+                  <Link
+                    href="/login"
+                    className="block w-full border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] py-3 text-center font-hud text-[9px] uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
+                  >
+                    Prenota Online
+                  </Link>
                 </div>
-
-                {/* Price & Duration */}
-                <div className="mb-5 flex items-baseline gap-3 border-b border-neutral-100 pb-5">
-                  <span className="text-3xl font-light text-neutral-900">{pkg.price}</span>
-                  <span className="text-sm text-neutral-400 font-light">{pkg.duration}</span>
-                </div>
-
-                {/* Description */}
-                <p className="mb-5 text-sm text-neutral-500 font-light leading-relaxed">
-                  {pkg.description}
-                </p>
-
-                {/* Includes */}
-                <div className="mb-6 flex-1">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-neutral-400">
-                    Include
-                  </p>
-                  <ul className="space-y-2">
-                    {pkg.includes.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-sm text-neutral-600 font-light">
-                        <span className="mt-1 h-px w-4 shrink-0 bg-neutral-300" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Ideal For */}
-                <div className="mb-6 rounded-xl bg-neutral-50 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-1">
-                    Ideale per
-                  </p>
-                  <p className="text-sm text-neutral-600 font-light">{pkg.ideal}</p>
-                </div>
-
-                {/* CTA */}
-                <Link
-                  href="/login"
-                  className="block w-full rounded-full bg-neutral-900 px-6 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-neutral-700"
-                >
-                  Prenota Online
-                </Link>
               </article>
             ))}
           </div>
         </section>
 
-        {/* ─── SUBSCRIPTIONS ─────────────────────────────────── */}
-        <section className="border-t border-neutral-200 bg-neutral-50">
-          <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 lg:px-14">
+        {/* ─── SUBSCRIPTIONS ─── */}
+        <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-14">
+          <div className="mx-auto max-w-6xl">
             <div className="mb-12">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">
-                Risparmia ogni mese
+              <p className="mb-3 font-hud text-[10px] uppercase tracking-[0.35em] text-[#ff7cc9]">
+                risparmia ogni mese
               </p>
-              <h2 className="text-3xl font-light tracking-wide text-neutral-900">
-                Abbonamenti mensili
+              <h2 className="font-poster text-3xl uppercase tracking-tight text-white sm:text-4xl">
+                Abbonamenti
               </h2>
-              <p className="mt-3 text-neutral-500 font-light">
+              <p className="mt-3 font-hud text-[10px] uppercase leading-6 tracking-[0.14em] text-white/60">
                 Mantieni le tue unghie sempre perfette con i nostri abbonamenti esclusivi.
               </p>
             </div>
@@ -248,79 +294,104 @@ export default function PacchettiPage() {
               {subscriptions.map((sub) => (
                 <div
                   key={sub.title}
-                  className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-8 transition hover:border-neutral-400 hover:shadow-lg"
+                  className="flex flex-col border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] shadow-[6px_6px_0_rgba(0,0,0,0.3)]"
                 >
-                  <span className="mb-4 inline-block rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 w-fit">
-                    {sub.savings}
-                  </span>
-                  <h3 className="text-2xl font-light tracking-wide text-neutral-900">
-                    {sub.title}
-                  </h3>
-                  <p className="mt-2 mb-6 text-3xl font-light text-neutral-900">
-                    {sub.price}
-                  </p>
-                  <ul className="mb-8 flex-1 space-y-3">
-                    {sub.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-sm text-neutral-600 font-light">
-                        <span className="mt-1 h-px w-4 shrink-0 bg-neutral-300" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <a
-                    href="https://wa.me/393391862999"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block w-full rounded-full border border-neutral-300 px-6 py-3.5 text-center text-sm font-medium text-neutral-700 transition hover:border-neutral-900 hover:text-neutral-900"
-                  >
-                    Richiedi info
-                  </a>
+                  {/* Title bar */}
+                  <div className="flex items-center justify-between bg-gradient-to-r from-[#0817a3] via-[#1736d0] to-[#4f75ff] px-2 py-1.5">
+                    <span className="font-hud text-[9px] uppercase tracking-[0.2em] text-white">
+                      {sub.title}.exe
+                    </span>
+                    <div className="flex gap-1">
+                      <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                      <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                      <span className="flex h-3 w-3 items-center justify-center border border-white/40 bg-[#c9c9c9] font-hud text-[7px] text-black">x</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-1 flex-col p-6">
+                    <span className="mb-4 w-fit border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-white/90 px-3 py-1 font-hud text-[8px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                      {sub.savings}
+                    </span>
+                    <h3 className="font-poster text-2xl uppercase tracking-tight text-[#1a1a1a]">
+                      {sub.title}
+                    </h3>
+                    <p className="mt-2 mb-6 font-poster text-3xl text-[#1a1a1a]">
+                      {sub.price}
+                    </p>
+                    <ul className="mb-8 flex-1 space-y-2">
+                      {sub.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-3 font-hud text-[9px] uppercase leading-5 tracking-[0.1em] text-[#333]">
+                          <span className="mt-2 h-px w-3 shrink-0 bg-[#ff4fb3]" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <a
+                      href="https://wa.me/393391862999"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block w-full border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-white/90 py-3 text-center font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a] shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
+                    >
+                      Richiedi info
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ─── GIFT CARDS ────────────────────────────────────── */}
-        <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10 lg:px-14">
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-10">
-            <div className="mb-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">Regalo</p>
-              <h3 className="text-2xl font-light tracking-wide text-neutral-900">
+        {/* ─── GIFT CARDS ─── */}
+        <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+          <div className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] shadow-[6px_6px_0_rgba(0,0,0,0.3)]">
+            {/* Title bar */}
+            <div className="flex items-center justify-between bg-gradient-to-r from-[#0817a3] via-[#1736d0] to-[#4f75ff] px-2 py-1.5">
+              <span className="font-hud text-[9px] uppercase tracking-[0.2em] text-white">giftcard.exe</span>
+              <div className="flex gap-1">
+                <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                <span className="flex h-3 w-3 items-center justify-center border border-white/40 bg-[#c9c9c9] font-hud text-[7px] text-black">x</span>
+              </div>
+            </div>
+            <div className="p-8">
+              <p className="mb-2 font-hud text-[10px] uppercase tracking-[0.3em] text-[#ff4fb3]">Regalo</p>
+              <h3 className="mb-4 font-poster text-3xl uppercase tracking-tight text-[#1a1a1a]">
                 Gift Card
               </h3>
+              <p className="mb-8 max-w-2xl font-hud text-[9px] uppercase leading-6 tracking-[0.12em] text-[#444]">
+                Regala un'esperienza di bellezza! Le nostre gift card sono disponibili per qualsiasi importo
+                e possono essere utilizzate per tutti i servizi.
+              </p>
+              <div className="mb-8 grid gap-4 sm:grid-cols-3">
+                {["50€", "100€", "150€"].map((amount) => (
+                  <div
+                    key={amount}
+                    className="border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-white/80 p-6 text-center shadow-[3px_3px_0_rgba(0,0,0,0.1)]"
+                  >
+                    <div className="font-poster text-3xl text-[#1a1a1a]">{amount}</div>
+                    <div className="mt-1 font-hud text-[8px] uppercase tracking-[0.2em] text-[#555]">Gift Card</div>
+                  </div>
+                ))}
+              </div>
+              <a
+                href="https://wa.me/393391862999"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] px-8 py-3 font-hud text-[10px] uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
+              >
+                Acquista Gift Card
+              </a>
             </div>
-            <p className="mb-8 max-w-2xl text-neutral-500 font-light leading-relaxed">
-              Regala un'esperienza di bellezza! Le nostre gift card sono
-              disponibili per qualsiasi importo e possono essere utilizzate
-              per tutti i servizi.
-            </p>
-            <div className="mb-8 grid gap-4 sm:grid-cols-3">
-              {["50€", "100€", "150€"].map((amount) => (
-                <div
-                  key={amount}
-                  className="rounded-xl border border-neutral-200 bg-white p-6 text-center transition hover:border-neutral-400 hover:shadow-md"
-                >
-                  <div className="text-2xl font-light text-neutral-900">{amount}</div>
-                  <div className="mt-1 text-xs uppercase tracking-widest text-neutral-400">Gift Card</div>
-                </div>
-              ))}
-            </div>
-            <a
-              href="https://wa.me/393391862999"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block rounded-full bg-neutral-900 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-700"
-            >
-              Acquista Gift Card
-            </a>
           </div>
         </section>
 
-        {/* ─── FAQ ───────────────────────────────────────────── */}
-        <section className="border-t border-neutral-200 bg-neutral-50">
-          <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 lg:px-14">
-            <h3 className="mb-10 text-2xl font-light tracking-wide text-neutral-900">
+        {/* ─── FAQ ─── */}
+        <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-14">
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 font-hud text-[10px] uppercase tracking-[0.35em] text-[#ff7cc9]">
+              faq.exe
+            </p>
+            <h3 className="mb-10 font-poster text-3xl uppercase tracking-tight text-white">
               Domande frequenti
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -332,39 +403,43 @@ export default function PacchettiPage() {
               ].map((faq, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-neutral-200 bg-white p-6 transition hover:border-neutral-400"
+                  className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] p-5 shadow-[4px_4px_0_rgba(0,0,0,0.2)]"
                 >
-                  <p className="mb-2 font-medium text-neutral-900">{faq.q}</p>
-                  <p className="text-sm text-neutral-500 font-light">{faq.a}</p>
+                  <p className="mb-2 font-hud text-[9px] font-bold uppercase tracking-[0.16em] text-[#1a1a1a]">
+                    {faq.q}
+                  </p>
+                  <p className="font-hud text-[9px] uppercase leading-6 tracking-[0.1em] text-[#555]">
+                    {faq.a}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ─── CTA FINALE ────────────────────────────────────── */}
-        <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10 lg:px-14">
-          <div className="rounded-3xl bg-neutral-900 px-8 py-16 text-center text-white sm:px-16">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
-              Pronta?
-            </p>
-            <h2 className="text-3xl font-light leading-snug tracking-wide sm:text-4xl">
-              Prenota il tuo pacchetto
+        {/* ─── CTA FINALE ─── */}
+        <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
+          <div className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] p-10 text-center shadow-[8px_8px_0_rgba(0,0,0,0.3)]">
+            <div className="mb-4 font-hud text-[9px] uppercase tracking-[0.3em] text-[#0817a3]">
+              booking.exe
+            </div>
+            <h2 className="font-poster text-3xl uppercase tracking-tight text-[#1a1a1a] sm:text-4xl">
+              Prenota il tuo<br />pacchetto
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-neutral-400 font-light leading-relaxed">
+            <p className="mx-auto mt-4 max-w-lg font-hud text-[10px] uppercase leading-6 tracking-[0.14em] text-[#444]">
               Contattaci per prenotare il tuo pacchetto preferito o per avere
               più informazioni. Il nostro team è a tua disposizione!
             </p>
-            <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link
                 href="/login"
-                className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-neutral-900 hover:bg-neutral-100 transition"
+                className="border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-white/90 px-8 py-3 font-hud text-[10px] uppercase tracking-[0.2em] text-[#1a1a1a] shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
               >
                 Prenota Online
               </Link>
               <Link
                 href="/contatti"
-                className="rounded-full border border-white/20 px-8 py-3.5 text-sm font-medium text-white hover:border-white/50 hover:bg-white/5 transition"
+                className="border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] px-8 py-3 font-hud text-[10px] uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
               >
                 Tutti i contatti
               </Link>

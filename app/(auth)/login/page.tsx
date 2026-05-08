@@ -4,22 +4,25 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authApi } from "@/lib/api";
-import ForgotPasswordModal from "@/app/components/ForgotPasswordModal";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showForgotModal, setShowForgotModal] = useState(false);
 
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const [isVerification, setIsVerification] = useState(false);
 
-  // Timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timer > 0) {
@@ -36,10 +39,9 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await authApi.verifyEmail(email, otp);
+      await authApi.verifyEmail(formData.email, otp);
       router.push("/area-utente");
     } catch (err: any) {
-      console.error("Verification Error:", err);
       setError(err.message || "Codice non valido");
     } finally {
       setLoading(false);
@@ -50,214 +52,353 @@ export default function LoginPage() {
     if (!canResend) return;
     setLoading(true);
     try {
-      await authApi.resendVerificationEmail(email);
+      await authApi.resendVerificationEmail(formData.email);
       setTimer(61);
       setCanResend(false);
       setError("");
     } catch (err: any) {
-      console.error("Resend Error:", err);
       setError(err.message || "Errore nell'invio del codice");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (formData.password !== formData.confirmPassword) {
+      setError("Le password non corrispondono");
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError("La password deve essere di almeno 6 caratteri");
+      return;
+    }
     setLoading(true);
     try {
+      const res = await authApi.register(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName,
+        formData.phone || undefined
+      );
       // @ts-ignore
-      const response = await authApi.login(email, password);
-      // @ts-ignore
-      if (response.verificationNeeded) {
-        setIsVerification(true);
+      if (res.verificationNeeded || res.message) {
+        setIsSuccess(true);
         setTimer(60);
         setCanResend(false);
-        return;
-      }
-      if (response.user.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/area-utente");
       }
     } catch (err: any) {
-      setError(err.message || "Errore durante il login");
+      setError(err.message || "Errore durante la registrazione");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   /* ── OTP Verification screen ── */
-  if (isVerification) {
+  if (isSuccess) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-white px-6">
-        <div className="mx-auto max-w-md w-full">
-          <div className="rounded-2xl border border-neutral-200 bg-white p-10 shadow-sm text-center">
-            <div className="mb-6 flex justify-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+      <main className="relative min-h-screen overflow-hidden bg-black">
+        <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+          <video autoPlay muted loop playsInline preload="auto" className="h-full w-full object-cover opacity-60">
+            <source src="/bgvideoY2K.webm" type="video/webm" />
+            <source src="/bgvideoY2K.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        <div className="flex min-h-screen items-center justify-center px-6 py-20">
+          <div className="w-full max-w-md">
+            <div className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] shadow-[8px_8px_0_rgba(0,0,0,0.4)]">
+              {/* Title bar */}
+              <div className="flex items-center justify-between bg-gradient-to-r from-[#0817a3] via-[#1736d0] to-[#4f75ff] px-2 py-1.5">
+                <span className="font-hud text-[9px] uppercase tracking-[0.2em] text-white">verify.exe</span>
+                <div className="flex gap-1">
+                  <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                  <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                  <span className="flex h-3 w-3 items-center justify-center border border-white/40 bg-[#c9c9c9] font-hud text-[7px] text-black">x</span>
+                </div>
+              </div>
+              {/* Menu strip */}
+              <div className="flex gap-4 border-b border-white/30 bg-[#c9c9c9] px-3 py-1">
+                {["File", "Security", "Help"].map((m) => (
+                  <span key={m} className="font-hud text-[8px] uppercase tracking-wider text-[#1a1a1a]">{m}</span>
+                ))}
+              </div>
+
+              <div className="p-8 text-center">
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-white/80 shadow-[3px_3px_0_rgba(0,0,0,0.1)]">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#0817a3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+
+                <p className="mb-2 font-hud text-[10px] uppercase tracking-[0.3em] text-[#ff4fb3]">Sultan Nails</p>
+                <h1 className="mb-3 font-poster text-2xl uppercase tracking-tight text-[#1a1a1a]">Verifica Email</h1>
+                <p className="mb-4 font-hud text-[9px] uppercase leading-6 tracking-[0.1em] text-[#444]">
+                  Abbiamo inviato un codice a{" "}
+                  <span className="font-bold text-[#1a1a1a]">{formData.email}</span>.
+                  Inseriscilo qui sotto per attivare il tuo account.
+                </p>
+                <div className="mb-6 border border-white/50 bg-white/40 px-4 py-3">
+                  <p className="font-hud text-[8px] uppercase leading-5 tracking-[0.12em] text-[#555]">
+                    Non hai ricevuto l'email? Controlla <strong>Spam</strong> o{" "}
+                    <strong>Posta Indesiderata</strong> o riprova tra 15 minuti.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="mb-5 border border-red-400/50 bg-red-100 px-4 py-3">
+                    <p className="font-hud text-[9px] uppercase tracking-[0.12em] text-red-700">{error}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleVerify} className="space-y-4">
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="000000"
+                    className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-4 py-3 text-center font-poster text-2xl tracking-widest text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                    maxLength={6}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] py-3 font-hud text-[10px] uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {loading ? "Verifica..." : "Verifica Account"}
+                  </button>
+                </form>
+
+                <div className="mt-6 border-t border-white/50 pt-6">
+                  <p className="mb-3 font-hud text-[9px] uppercase tracking-[0.14em] text-[#555]">
+                    Non hai ricevuto il codice?
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={!canResend || loading}
+                    className="font-hud text-[9px] uppercase tracking-[0.16em] text-[#0817a3] underline underline-offset-2 hover:text-[#ff4fb3] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {canResend ? "Invia nuovo codice" : `Invia nuovo codice tra ${timer}s`}
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setIsSuccess(false)}
+                  className="mt-4 font-hud text-[9px] uppercase tracking-[0.14em] text-[#888] hover:text-[#1a1a1a]"
+                >
+                  ← Indietro
+                </button>
               </div>
             </div>
-            <h1 className="mb-3 text-2xl font-light tracking-wide text-neutral-900">
-              Verifica Email
-            </h1>
-            <p className="mb-4 text-sm text-neutral-500 font-light leading-relaxed">
-              Abbiamo inviato un codice a{" "}
-              <span className="font-medium text-neutral-900">{email}</span>.
-              Inseriscilo qui sotto per accedere.
-            </p>
-            <p className="mb-6 text-xs text-neutral-400 bg-neutral-50 p-3 rounded-xl border border-neutral-100">
-              Non hai ricevuto l'email? Controlla la cartella{" "}
-              <strong>Spam</strong> o <strong>Posta Indesiderata</strong> o
-              riprova tra 15 minuti.
-            </p>
-
-            {error && (
-              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleVerify} className="space-y-5">
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Codice OTP (6 cifre)"
-                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-center text-2xl font-light tracking-widest text-neutral-900 placeholder:text-neutral-300 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200"
-                maxLength={6}
-                required
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-full bg-neutral-900 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Verifica..." : "Verifica Account"}
-              </button>
-            </form>
-
-            <div className="mt-6 border-t border-neutral-100 pt-6">
-              <p className="mb-3 text-sm text-neutral-400">Non hai ricevuto il codice?</p>
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                disabled={!canResend || loading}
-                className="text-sm font-medium text-neutral-700 underline underline-offset-2 hover:text-neutral-900 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {canResend ? "Invia nuovo codice" : `Invia nuovo codice tra ${timer}s`}
-              </button>
-            </div>
-
-            <button
-              onClick={() => setIsVerification(false)}
-              className="mt-4 text-sm text-neutral-400 hover:text-neutral-600"
-            >
-              ← Indietro
-            </button>
           </div>
         </div>
       </main>
     );
   }
 
-  /* ── Main Login screen ── */
+  /* ── Main Register screen ── */
   return (
-    <>
-      <main className="min-h-screen bg-white pt-24 pb-20 px-6">
-        <div className="mx-auto max-w-md">
+    <main className="relative min-h-screen overflow-hidden bg-black">
+      {/* Background video */}
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+        <video autoPlay muted loop playsInline preload="auto" className="h-full w-full object-cover opacity-60">
+          <source src="/bgvideoY2K.webm" type="video/webm" />
+          <source src="/bgvideoY2K.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      {/* Grain */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 opacity-[0.035]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <div className="flex min-h-screen items-center justify-center px-6 py-20">
+        <div className="w-full max-w-md">
 
           {/* Back link */}
-          <div className="mb-8">
-            <Link href="/" className="text-sm text-neutral-400 hover:text-neutral-700 transition">
+          <div className="mb-6">
+            <Link href="/" className="font-hud text-[9px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition">
               ← Torna alla home
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200 bg-white p-10 shadow-sm">
-            <div className="mb-8 text-center">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-400">
-                Sultan Nails
-              </p>
-              <h1 className="text-3xl font-light tracking-wide text-neutral-900">Accedi</h1>
-              <p className="mt-2 text-sm text-neutral-400 font-light">
-                Accedi al tuo account per gestire le prenotazioni
-              </p>
+          {/* Finestra register */}
+          <div className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] shadow-[8px_8px_0_rgba(0,0,0,0.4)]">
+            {/* Title bar */}
+            <div className="flex items-center justify-between bg-gradient-to-r from-[#0817a3] via-[#1736d0] to-[#4f75ff] px-2 py-1.5">
+              <span className="font-hud text-[9px] uppercase tracking-[0.2em] text-white">
+                SultanNails.exe — Registrazione
+              </span>
+              <div className="flex gap-1">
+                <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                <span className="flex h-3 w-3 items-center justify-center border border-white/40 bg-[#c9c9c9] font-hud text-[7px] text-black">x</span>
+              </div>
+            </div>
+            {/* Menu strip */}
+            <div className="flex gap-4 border-b border-white/30 bg-[#c9c9c9] px-3 py-1">
+              {["File", "Account", "Help"].map((m) => (
+                <span key={m} className="font-hud text-[8px] uppercase tracking-wider text-[#1a1a1a]">{m}</span>
+              ))}
             </div>
 
-            {error && (
-              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-medium text-neutral-700">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-neutral-900 placeholder:text-neutral-300 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200 transition"
-                  placeholder="tua@email.com"
-                />
+            <div className="p-8">
+              {/* Header */}
+              <div className="mb-8 text-center">
+                <p className="mb-2 font-hud text-[10px] uppercase tracking-[0.3em] text-[#ff4fb3]">Sultan Nails</p>
+                <h1 className="font-poster text-3xl uppercase tracking-tight text-[#1a1a1a]">Registrati</h1>
+                <p className="mt-2 font-hud text-[9px] uppercase tracking-[0.12em] text-[#555]">
+                  Crea il tuo account per prenotare online
+                </p>
               </div>
 
-              <div>
-                <label htmlFor="password" className="mb-2 block text-sm font-medium text-neutral-700">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-neutral-900 placeholder:text-neutral-300 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200 transition"
-                  placeholder="••••••••"
-                />
-              </div>
+              {error && (
+                <div className="mb-6 border border-red-400/50 bg-red-100 px-4 py-3">
+                  <p className="font-hud text-[9px] uppercase tracking-[0.12em] text-red-700">{error}</p>
+                </div>
+              )}
 
-              <div className="flex justify-end">
+              <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                {/* Nome + Cognome */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="firstName" className="mb-2 block font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                      Nome
+                    </label>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required
+                      placeholder="Nome"
+                      className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-3 py-2.5 font-hud text-[10px] uppercase tracking-[0.1em] text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="mb-2 block font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                      Cognome
+                    </label>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required
+                      placeholder="Cognome"
+                      className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-3 py-2.5 font-hud text-[10px] uppercase tracking-[0.1em] text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="mb-2 block font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="tua@email.com"
+                    className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-4 py-2.5 font-hud text-[10px] uppercase tracking-[0.1em] text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                  />
+                </div>
+
+                {/* Telefono */}
+                <div>
+                  <label htmlFor="phone" className="mb-2 block font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                    Telefono{" "}
+                    <span className="text-[#888]">(opzionale)</span>
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+39 123 456 7890"
+                    className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-4 py-2.5 font-hud text-[10px] uppercase tracking-[0.1em] text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label htmlFor="password" className="mb-2 block font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="Minimo 6 caratteri"
+                    className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-4 py-2.5 font-hud text-[10px] tracking-[0.1em] text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                  />
+                </div>
+
+                {/* Conferma Password */}
+                <div>
+                  <label htmlFor="confirmPassword" className="mb-2 block font-hud text-[9px] uppercase tracking-[0.2em] text-[#1a1a1a]">
+                    Conferma Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    placeholder="Ripeti la password"
+                    className="w-full border-b-2 border-l border-r-2 border-t border-b-white/50 border-l-[#787878] border-r-white/50 border-t-[#787878] bg-white px-4 py-2.5 font-hud text-[10px] tracking-[0.1em] text-[#1a1a1a] placeholder:text-[#bbb] focus:outline-none focus:ring-2 focus:ring-[#0817a3]/30"
+                  />
+                </div>
+
+                {/* Submit */}
                 <button
-                  type="button"
-                  onClick={() => setShowForgotModal(true)}
-                  className="text-sm text-neutral-500 hover:text-neutral-800 transition underline underline-offset-2"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] py-3.5 font-hud text-[10px] uppercase tracking-[0.22em] text-white shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Password dimenticata?
+                  {loading ? "Registrazione in corso..." : "Registrati"}
                 </button>
+              </form>
+
+              {/* Login link */}
+              <div className="mt-6 border-t border-white/50 pt-6 text-center">
+                <p className="font-hud text-[9px] uppercase tracking-[0.14em] text-[#555]">
+                  Hai già un account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-bold text-[#0817a3] underline underline-offset-2 hover:text-[#ff4fb3] transition"
+                  >
+                    Accedi
+                  </Link>
+                </p>
               </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-full bg-neutral-900 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Accesso in corso..." : "Accedi"}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-neutral-500">
-              Non hai un account?{" "}
-              <Link href="/register" className="font-medium text-neutral-900 underline underline-offset-2 hover:text-neutral-700">
-                Registrati
-              </Link>
             </div>
           </div>
-        </div>
-      </main>
 
-      <ForgotPasswordModal
-        isOpen={showForgotModal}
-        onClose={() => setShowForgotModal(false)}
-      />
-    </>
+        </div>
+      </div>
+    </main>
   );
 }

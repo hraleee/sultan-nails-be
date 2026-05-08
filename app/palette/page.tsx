@@ -1,4 +1,5 @@
 import Header from "../components/Header";
+import Link from "next/link";
 
 const collections = [
   {
@@ -76,18 +77,42 @@ export default function PalettePage() {
   return (
     <>
       <Header />
-      <main className="text-neutral-900" style={{ paddingTop: 68 }}>
+
+      {/* Background video */}
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-black">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover opacity-60"
+        >
+          <source src="/bgvideoY2K.webm" type="video/webm" />
+          <source src="/bgvideoY2K.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      {/* Grain */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 opacity-[0.035]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <main className="text-white" style={{ paddingTop: 68 }}>
 
         {/* ─── PAGE HEADER ─── */}
-        <section className="border-b border-neutral-200 bg-neutral-50">
-          <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
-              Palette
+        <section className="border-b border-white/10 px-6 pb-12 pt-16 sm:px-10 lg:px-14">
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 font-hud text-[10px] uppercase tracking-[0.35em] text-[#ff7cc9]">
+              palette.exe
             </p>
-            <h1 className="text-4xl font-light leading-tight tracking-wide text-neutral-900 sm:text-5xl">
-              Oltre 120 tonalità selezionate
+            <h1 className="font-poster text-5xl uppercase tracking-tight text-white sm:text-6xl">
+              Oltre 120<br />tonalità
             </h1>
-            <p className="mt-4 max-w-2xl text-lg text-neutral-500 font-light leading-relaxed">
+            <p className="mt-4 max-w-2xl font-hud text-[11px] uppercase leading-7 tracking-[0.16em] text-white/70">
               Pigmenti premium certificati EU, aggiornati ogni stagione. Ogni colore è testato
               per garantire fedeltà cromatica e durata eccezionale.
             </p>
@@ -97,10 +122,10 @@ export default function PalettePage() {
         {/* ─── FINITURE ─── */}
         <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
           <div className="mb-10">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
-              Effetti disponibili
+            <p className="mb-3 font-hud text-[10px] uppercase tracking-[0.35em] text-[#ff7cc9]">
+              effetti disponibili
             </p>
-            <h2 className="text-3xl font-light tracking-wide text-neutral-900">
+            <h2 className="font-poster text-3xl uppercase tracking-tight text-white sm:text-4xl">
               Finiture
             </h2>
           </div>
@@ -108,48 +133,80 @@ export default function PalettePage() {
             {finishes.map((f) => (
               <div
                 key={f.name}
-                className="rounded-2xl border border-neutral-200 bg-white p-6 hover:shadow-sm transition"
+                className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] p-5 shadow-[4px_4px_0_rgba(0,0,0,0.2)]"
               >
-                <h3 className="mb-2 text-base font-medium text-neutral-900">{f.name}</h3>
-                <p className="text-sm text-neutral-500 font-light leading-relaxed">{f.description}</p>
+                <div className="mb-3 h-px w-8 bg-[#0817a3]" />
+                <h3 className="mb-1 font-hud text-[10px] font-bold uppercase tracking-[0.18em] text-[#1a1a1a]">
+                  {f.name}
+                </h3>
+                <p className="font-hud text-[9px] uppercase leading-6 tracking-[0.12em] text-[#444]">
+                  {f.description}
+                </p>
               </div>
             ))}
           </div>
         </section>
 
         {/* ─── COLLEZIONI ─── */}
-        <section className="border-t border-neutral-200 bg-neutral-50">
-          <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14 space-y-10">
+        <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-14">
+          <div className="mx-auto max-w-6xl space-y-10">
             <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
-                Collezioni
+              <p className="mb-3 font-hud text-[10px] uppercase tracking-[0.35em] text-[#ff7cc9]">
+                collezioni
               </p>
-              <h2 className="text-3xl font-light tracking-wide text-neutral-900">
-                Le nostre palette cromatiche
+              <h2 className="font-poster text-3xl uppercase tracking-tight text-white sm:text-4xl">
+                Le nostre palette
               </h2>
             </div>
 
             {collections.map((col) => (
               <div
                 key={col.name}
-                className="rounded-2xl border border-neutral-200 bg-white p-7"
+                className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] shadow-[6px_6px_0_rgba(0,0,0,0.3)]"
               >
-                <div className="mb-6">
-                  <h3 className="text-xl font-medium text-neutral-900">{col.name}</h3>
-                  <p className="mt-1 text-sm text-neutral-500 font-light">{col.description}</p>
+                {/* Title bar */}
+                <div className="flex items-center justify-between bg-gradient-to-r from-[#0817a3] via-[#1736d0] to-[#4f75ff] px-2 py-1.5">
+                  <span className="font-hud text-[9px] uppercase tracking-[0.2em] text-white">
+                    {col.name}.exe
+                  </span>
+                  <div className="flex gap-1">
+                    <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                    <span className="h-3 w-3 border border-white/40 bg-[#c9c9c9]" />
+                    <span className="flex h-3 w-3 items-center justify-center border border-white/40 bg-[#c9c9c9] font-hud text-[7px] text-black">x</span>
+                  </div>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {col.colors.map((color) => (
-                    <div key={color.name} className="group">
-                      <div
-                        className="mb-3 h-20 w-full rounded-xl border border-neutral-200"
-                        style={{ backgroundColor: color.hex }}
-                      />
-                      <p className="text-sm font-medium text-neutral-900">{color.name}</p>
-                      <p className="text-xs text-neutral-500 font-light">{color.tone}</p>
-                      <p className="mt-0.5 font-mono text-xs text-neutral-300">{color.hex}</p>
-                    </div>
+
+                {/* Menu strip */}
+                <div className="flex gap-4 border-b border-white/30 bg-[#c9c9c9] px-3 py-1">
+                  {["File", "View", "Colors", "Help"].map((m) => (
+                    <span key={m} className="font-hud text-[8px] uppercase tracking-wider text-[#1a1a1a]">{m}</span>
                   ))}
+                </div>
+
+                {/* Body */}
+                <div className="p-6">
+                  <p className="mb-6 font-hud text-[9px] uppercase tracking-[0.14em] text-[#0817a3]">
+                    {col.description}
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {col.colors.map((color) => (
+                      <div key={color.name}>
+                        <div
+                          className="mb-3 h-20 w-full border border-white/40 shadow-[inset_2px_2px_0_rgba(255,255,255,0.6),inset_-2px_-2px_0_rgba(0,0,0,0.15)]"
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        <p className="font-hud text-[9px] font-bold uppercase tracking-[0.14em] text-[#1a1a1a]">
+                          {color.name}
+                        </p>
+                        <p className="font-hud text-[8px] uppercase tracking-[0.1em] text-[#555]">
+                          {color.tone}
+                        </p>
+                        <p className="mt-0.5 font-hud text-[8px] tracking-wider text-[#888]">
+                          {color.hex}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -158,11 +215,14 @@ export default function PalettePage() {
 
         {/* ─── CTA ─── */}
         <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 lg:px-14">
-          <div className="rounded-3xl bg-neutral-900 px-8 py-14 text-center text-white sm:px-16">
-            <h2 className="text-3xl font-light tracking-wide">
-              Non trovi il colore perfetto?
+          <div className="border-b-2 border-l-2 border-r border-t-2 border-b-white/20 border-l-white/80 border-r-white/20 border-t-white/80 bg-[#c9c9c9] p-10 text-center shadow-[8px_8px_0_rgba(0,0,0,0.3)]">
+            <div className="mb-4 font-hud text-[9px] uppercase tracking-[0.3em] text-[#0817a3]">
+              custom.mix.exe
+            </div>
+            <h2 className="font-poster text-3xl uppercase tracking-tight text-[#1a1a1a] sm:text-4xl">
+              Non trovi il<br />colore perfetto?
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-neutral-400 font-light">
+            <p className="mx-auto mt-4 max-w-lg font-hud text-[10px] uppercase leading-6 tracking-[0.14em] text-[#444]">
               Possiamo creare miscele personalizzate per te! Porta una foto o un campione e lo riprodurremo.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -170,16 +230,16 @@ export default function PalettePage() {
                 href="https://wa.me/393391862999"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-neutral-900 hover:bg-neutral-100 transition"
+                className="border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-white/90 px-8 py-3 font-hud text-[10px] uppercase tracking-[0.2em] text-[#1a1a1a] shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
               >
                 Prenota consulenza
               </a>
-              <a
+              <Link
                 href="/servizi"
-                className="rounded-full border border-white/20 px-8 py-3.5 text-sm font-medium text-white hover:border-white/50 transition"
+                className="border-b border-l-2 border-r border-t-2 border-b-[#787878] border-l-white border-r-[#787878] border-t-white bg-[#ff4fb3] px-8 py-3 font-hud text-[10px] uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_rgba(0,0,0,0.15)] transition-transform hover:-translate-y-0.5"
               >
                 Vedi i servizi
-              </a>
+              </Link>
             </div>
           </div>
         </section>

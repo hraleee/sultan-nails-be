@@ -115,7 +115,7 @@ export default function Header() {
         }`}
       >
         <div className="flex flex-col h-full pt-6">
-  <div className="mb-10">
+  <div className="mb-10 -ml-7">
     <img src="/laura_fluxx.png" alt="Logo" className="w-40 h-auto" />
   </div>
 

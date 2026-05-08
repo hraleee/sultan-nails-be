@@ -53,7 +53,7 @@ export default function RootLayout({
       lang="it"
       className={`${orbitron.variable} ${shareTechMono.variable} ${bebasNeue.variable} ${rajdhani.variable}`}
     >
-      <body className="antialiased min-h-screen flex flex-col">
+      <body className="antialiased min-h-screen flex flex-col bg-black">
         <div className="flex-grow">{children}</div>
         <Footer />
       </body>

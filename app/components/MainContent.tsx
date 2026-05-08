@@ -3,6 +3,7 @@
 import Link from "next/link";
 import styles from "./MainContent.module.css";
 import { useState } from "react";
+import RetroLoader from "./RetroLoader";
 
 const chatLines = [
   { from: "stylist.exe", text: "hot pink chrome? say less.", side: "left" },
@@ -41,24 +42,7 @@ export default function MainContent() {
   return (
    <main className={styles.page}>
   {!isVideoReady && (
-    <div className={styles.videoLoader}>
-      <div className={styles.loaderWindow}>
-        <div className={styles.loaderTopBar}>
-          <span>booting_l'aura_flux.exe</span>
-          <span className={styles.loaderDots}>•••</span>
-        </div>
-
-        <div className={styles.loaderBody}>
-          <div className={styles.loaderTitle}>loading cyber-pop world</div>
-          <div className={styles.loaderBar}>
-            <div className={styles.loaderBarFill} />
-          </div>
-          <div className={styles.loaderMeta}>
-            please wait / glossy assets / video sync
-          </div>
-        </div>
-      </div>
-    </div>
+    <RetroLoader topLabel="booting_sultan_nails.exe" />
   )}
 
   <div className={styles.background}>
@@ -68,11 +52,12 @@ export default function MainContent() {
   muted
   loop
   playsInline
-  preload="metadata"
+  preload="auto"
   onLoadedData={() => setIsVideoReady(true)}
   onCanPlayThrough={() => setIsVideoReady(true)}
   onError={() => setIsVideoReady(true)}
 >
+  <source src="/bgvideoY2K.webm" type="video/webm" />
   <source src="/bgvideoY2K.mp4" type="video/mp4" />
 </video>
   </div>
